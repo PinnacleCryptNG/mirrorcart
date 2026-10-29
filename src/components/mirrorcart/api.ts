@@ -45,15 +45,25 @@ export const api = {
 };
 
 /** Resize to a 1024 px long side JPEG in the browser before upload (SPEC §4). */
-export async function resizeToJpeg(src: Blob | HTMLVideoElement, longSide = 1024): Promise<Blob> {
+/** Long side 1024 JPEG, cropped around the detected person so they fill the frame (YouCam's ≥80% guidance). */
+export async function resizeToJpeg(src: Blob | HTMLVideoElement, longSide = 1024): Promise<{ blob: Blob; framed: boolean; warnings: string[] }> {
   let w: number, h: number, draw: CanvasImageSource;
   if (src instanceof HTMLVideoElement) { w = src.videoWidth; h = src.videoHeight; draw = src; }
   else { const bmp = await createImageBitmap(src); w = bmp.width; h = bmp.height; draw = bmp; }
-  const scale = Math.min(1, longSide / Math.max(w, h));
+  const scale = Math.min(1, (longSide * 2) / Math.max(w, h));
+  const full = document.createElement("canvas");
+  full.width = Math.round(w * scale); full.height = Math.round(h * scale);
+  const fctx = full.getContext("2d")!;
+  if (src instanceof HTMLVideoElement) { fctx.translate(full.width, 0); fctx.scale(-1, 1); }
+  fctx.drawImage(draw, 0, 0, full.width, full.height);
+  const { frameSubject } = await import("./frame");
+  const { canvas, framed, warnings } = await frameSubject(full);
+  const k = Math.min(1, longSide / Math.max(canvas.width, canvas.height));
   const c = document.createElement("canvas");
-  c.width = Math.round(w * scale); c.height = Math.round(h * scale);
+  c.width = Math.round(canvas.width * k); c.height = Math.round(canvas.height * k);
   const ctx = c.getContext("2d")!;
-  if (src instanceof HTMLVideoElement) { ctx.translate(c.width, 0); ctx.scale(-1, 1); }
-  ctx.drawImage(draw, 0, 0, c.width, c.height);
-  return new Promise((res, rej) => c.toBlob((b) => (b ? res(b) : rej(new Error("encode_failed"))), "image/jpeg", 0.9));
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(canvas, 0, 0, c.width, c.height);
+  const blob = await new Promise<Blob>((res, rej) => c.toBlob((b) => (b ? res(b) : rej(new Error("encode_failed"))), "image/jpeg", 0.92));
+  return { blob, framed, warnings };
 }

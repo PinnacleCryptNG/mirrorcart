@@ -36,8 +36,8 @@ export function PhotoStage(props: {
   mode: ModeInfo | null; onSelfie: (s: Selfie, gender: "female" | "male" | undefined) => void; onLoadOutfit: (items: Item[]) => void; needsGender: boolean;
 }) {
   const { mode } = props;
-  const [gender, setGender] = useState<"female" | "male" | "">("");
-  const [preview, setPreview] = useState<{ blob: Blob; url: string } | null>(null);
+  const [gender, setGender] = useState<"female" | "male" | "">("female");
+  const [preview, setPreview] = useState<{ blob: Blob; url: string; framed: boolean; warnings: string[] } | null>(null);
   const [cam, setCam] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
@@ -57,16 +57,18 @@ export function PhotoStage(props: {
   }
   async function snap() {
     if (!video.current) return;
-    const b = await resizeToJpeg(video.current);
+    const r = await resizeToJpeg(video.current);
     stream.current?.getTracks().forEach((t) => t.stop());
     setCam(false);
-    setPreview({ blob: b, url: URL.createObjectURL(b) });
+    setPreview({ ...r, url: URL.createObjectURL(r.blob) });
   }
   async function pick(f?: File) {
     if (!f) return;
     setErr("");
-    try { const b = await resizeToJpeg(f); setPreview({ blob: b, url: URL.createObjectURL(b) }); }
+    setBusy(true);
+    try { const r = await resizeToJpeg(f); setPreview({ ...r, url: URL.createObjectURL(r.blob) }); }
     catch { setErr("Couldn't read that image. Try a JPEG or PNG."); }
+    finally { setBusy(false); }
   }
   async function use() {
     if (!preview) return;
@@ -121,6 +123,12 @@ export function PhotoStage(props: {
             </label>
           ))}
         </fieldset>
+        {preview && (preview.framed || preview.warnings.length > 0) && (
+          <div className="mt-3 space-y-1 text-xs">
+            {preview.framed && <p className="text-lime">Auto-framed around you for a sharper, truer fit.</p>}
+            {preview.warnings.map((w) => <p key={w} className="text-amber-200">⚠ {w}</p>)}
+          </div>
+        )}
         {err && <p className="mt-3 text-sm text-red-300">{err}</p>}
       </div>
       <div>
