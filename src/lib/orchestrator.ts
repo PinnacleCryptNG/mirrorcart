@@ -42,6 +42,8 @@ export type Selfie = { id: string; hash: string; url: string; createdAt: number;
 
 export type Job = {
   id: string;
+  /** Swap/fabric re-runs of an earlier try-on; excluded from started/completed funnel counts. */
+  rerun?: boolean;
   store: string;
   selfieId: string;
   mode: "live" | "demo";
@@ -175,7 +177,7 @@ export async function purgeSelfie(id: string) {
 
 /* ---------- jobs ---------- */
 
-export async function startJob(opts: { selfieId: string; items: ChainItem[]; gender?: "female" | "male"; store?: string; forceDemo?: boolean }) {
+export async function startJob(opts: { selfieId: string; items: ChainItem[]; gender?: "female" | "male"; store?: string; forceDemo?: boolean; rerun?: boolean }) {
   const selfie = await getSelfie(opts.selfieId);
   if (!selfie) throw new Error("photo_not_found");
   const status = await modeStatus();
@@ -186,7 +188,7 @@ export async function startJob(opts: { selfieId: string; items: ChainItem[]; gen
   let gender = opts.gender;
   if (!gender && selfie.demo) gender = (await getManifest()).models.find((m) => `demo:${m.id}` === selfie.id)?.gender;
   const job: Job = {
-    id: randomUUID(), store: opts.store || "aurel-demo", selfieId: selfie.id, mode: demo ? "demo" : "live",
+    id: randomUUID(), rerun: !!opts.rerun, store: opts.store || "aurel-demo", selfieId: selfie.id, mode: demo ? "demo" : "live",
     client: demo ? "demo" : getClient().kind, gender: gender || "female", steps, skipped, cursor: 0, done: false,
     createdAt: Date.now(), sourceUrl: selfie.url,
   };
@@ -361,7 +363,7 @@ export async function advance(jobId: string, origin: string): Promise<Job> {
         }
       }
     }
-    if (job.done) await track("tryon_completed", { store: job.store });
+    if (job.done && !job.rerun) await track("tryon_completed", { store: job.store });
     await saveJob(job);
     return job;
   } finally {

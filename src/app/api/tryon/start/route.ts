@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
     : [];
   const gender = b.gender === "male" ? "male" : b.gender === "female" ? "female" : undefined;
   try {
-    const job = await startJob({ selfieId: String(b.selfieId || ""), items, gender, store: b.store });
+    const job = await startJob({ selfieId: String(b.selfieId || ""), items, gender, store: b.store, rerun: !!b.rerun });
     if (!b.rerun) await track("tryon_started", { store: job.store });
     return json({ jobId: job.id, job: view(job) });
   } catch (e) {
