@@ -185,7 +185,7 @@ export function Filmstrip({ job, active, onPick }: { job: JobView; active?: numb
           className={`relative h-28 w-20 shrink-0 overflow-hidden rounded-lg border ${active === i ? "border-lime" : "border-white/15"} ${s.outputUrl ? "curtain-in" : ""}`}>
           {s.outputUrl ? <img src={s.outputUrl} alt={s.label} className="h-full w-full object-cover" /> :
             <span className={`grid h-full place-items-center text-[10px] text-white/40 ${s.status === "running" ? "sheen bg-white/5" : ""}`}>{s.status === "running" ? "rendering" : s.status}</span>}
-          <span className="absolute bottom-0 inset-x-0 bg-black/70 text-[9px] font-mono">{i + 1}. {stepLabel(s).toUpperCase()}</span>
+          <span className="absolute bottom-0 inset-x-0 bg-black/70 text-[9px] font-mono">{i + 1}. {stepLabel(s).toUpperCase()}{s.branch ? " · SCENE" : ""}</span>
         </button>
       ))}
     </div>

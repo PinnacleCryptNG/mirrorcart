@@ -61,6 +61,7 @@ export function ResultViewer(p: {
   const [open, setOpen] = useState<{ id: string; what: "swap" | "fabric" } | null>(null);
   const [fabrics, setFabrics] = useState<{ id: string; thumb: string; title?: string }[] | null>(null);
   const [sharing, setSharing] = useState(false);
+  const lastMain = job.steps.reduce((a, s, i) => (s.outputUrl && !s.branch ? i : a), -1);
   const shown = pick == null ? job.finalUrl || job.sourceUrl : pick < 0 ? job.sourceUrl : job.steps[pick].outputUrl || job.sourceUrl;
 
   useEffect(() => { if (open?.what === "fabric" && !fabrics) api.fabrics().then((r) => setFabrics(r.templates)).catch(() => setFabrics([])); }, [open, fabrics]);
@@ -88,7 +89,12 @@ export function ResultViewer(p: {
     <div className="rise grid gap-6 lg:grid-cols-[1.1fr_1fr]">
       <div className="space-y-3">
         <BeforeAfter before={job.sourceUrl} after={shown} />
-        <Filmstrip job={job} active={pick ?? job.steps.length - 1} onPick={setPick} />
+        <Filmstrip job={job} active={pick ?? lastMain} onPick={setPick} />
+        {job.sceneUrl && (
+          <button onClick={() => setPick(job.steps.findIndex((s) => s.branch))} className="w-full rounded-xl border border-white/15 px-3 py-2 text-left text-xs text-white/70 hover:border-lime">
+            <b className="text-white">Bag styled scene →</b> YouCam Bag VTO re-renders the whole setting, so the bag is shown as its own styled shot instead of feeding the outfit chain.
+          </button>
+        )}
       </div>
       <div className="space-y-4">
         <div className="flex items-end justify-between gap-3">

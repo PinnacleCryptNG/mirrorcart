@@ -1,5 +1,6 @@
 import "server-only";
 import { createHash, randomUUID } from "crypto";
+import sharp from "sharp";
 import { getVariant, Slot, slotOf, SLOT_LABEL } from "@/lib/catalog";
 import { config, forcedDemo, publicUrl } from "@/lib/config";
 import { kv } from "@/lib/kv";
@@ -31,6 +32,10 @@ export type Step = {
   startedAt?: number;
   polls?: number;
   nextPollAt?: number;
+  /** Bag VTO regenerates the whole scene, so its output is a side branch, not the next input. */
+  branch?: boolean;
+  /** Jewellery runs on an upscaled head-and-shoulders crop that is composited back. */
+  crop?: { left: number; top: number; width: number; height: number };
 };
 
 export type Selfie = { id: string; hash: string; url: string; createdAt: number; demo?: boolean };
@@ -49,6 +54,7 @@ export type Job = {
   capHit?: boolean;
   createdAt: number;
   finalUrl?: string;
+  sceneUrl?: string;
   sourceUrl: string;
 };
 
@@ -87,8 +93,8 @@ export function planChain(items: ChainItem[], maxSteps = config.maxChainSteps) {
     if (bySlot.has("lower")) order.push("lower");
   }
   if (bySlot.has("shoes")) order.push("shoes");
-  if (bySlot.has("bag")) order.push("bag");
   if (jewel) order.push(jewel);
+  if (bySlot.has("bag")) order.push("bag");
 
   const steps: Step[] = [];
   let itemSteps = 0;
@@ -99,7 +105,7 @@ export function planChain(items: ChainItem[], maxSteps = config.maxChainSteps) {
     const feature: Feature =
       slot === "shoes" ? "shoes-transfer" : slot === "bag" ? "bag" : slot === "necklace" ? "2d-vto/necklace" : slot === "earring" ? "2d-vto/earring" : "cloth-v4";
     const garmentCategory = slot === "upper" ? "upper_body" : slot === "lower" ? "lower_body" : slot === "full" ? "full_body" : undefined;
-    steps.push({ sig: `${feature}:${e.productId}:${e.variantId}`, kind: slot, feature, productId: e.productId, variantId: e.variantId, garmentCategory, refUrl: e.refUrl, label: e.name, status: "pending" });
+    steps.push({ sig: `${feature}:${e.productId}:${e.variantId}`, kind: slot, feature, productId: e.productId, variantId: e.variantId, garmentCategory, refUrl: e.refUrl, label: e.name, status: "pending", ...(slot === "bag" ? { branch: true } : {}) });
     if (e.fabric && garmentCategory)
       steps.push({ sig: `fabric:${e.fabric}`, kind: "fabric", feature: "fabric", productId: e.productId, variantId: e.variantId, fabricTemplateId: e.fabric, label: `Fabric swap on ${e.name}`, status: "pending" });
   }
@@ -193,7 +199,7 @@ export const getJob = (id: string) => kv.get<Job>(`job:${id}`);
 const saveJob = (job: Job) => kv.set(`job:${job.id}`, job, DAY);
 
 function prevOutput(job: Job, i: number) {
-  for (let k = i - 1; k >= 0; k--) if (job.steps[k].outputUrl) return job.steps[k].outputUrl!;
+  for (let k = i - 1; k >= 0; k--) if (job.steps[k].outputUrl && !job.steps[k].branch) return job.steps[k].outputUrl!;
   return job.sourceUrl;
 }
 
@@ -216,8 +222,26 @@ async function asInput(url: string, origin: string) {
   return { id };
 }
 
+const isJewel = (f: Feature) => f === "2d-vto/necklace" || f === "2d-vto/earring";
+
+/** Necklace/earring need the neck ≥15% of image width and centred; full-body photos fail, so crop the head and shoulders. */
+async function jewelleryCrop(job: Job, step: Step, inputUrl: string, origin: string) {
+  const bytes = await readImage(inputUrl, origin);
+  const { width: W = 0, height: H = 0 } = await sharp(bytes).metadata();
+  if (!W || H / W < 1.3) return inputUrl;
+  const width = Math.round(W * 0.36), left = Math.round((W - width) / 2), height = Math.min(H, Math.round(width * 1.3));
+  step.crop = { left, top: 0, width, height };
+  const crop = await sharp(bytes).extract({ left, top: 0, width, height }).resize({ width: 768, kernel: "lanczos3" }).jpeg({ quality: 92 }).toBuffer();
+  return putImage(`mc/${job.selfieId}/crop-${step.cacheKey}.jpg`, crop);
+}
+
+async function compositeCrop(baseUrl: string, result: Buffer, crop: NonNullable<Step["crop"]>, origin: string) {
+  const patch = await sharp(result).resize(crop.width, crop.height, { fit: "fill" }).toBuffer();
+  return sharp(await readImage(baseUrl, origin)).composite([{ input: patch, left: crop.left, top: crop.top }]).jpeg({ quality: 92 }).toBuffer();
+}
+
 async function buildBody(job: Job, step: Step, inputUrl: string, origin: string) {
-  const src = await asInput(inputUrl, origin);
+  const src = await asInput(isJewel(step.feature) ? await jewelleryCrop(job, step, inputUrl, origin) : inputUrl, origin);
   const srcField = src.url ? { src_file_url: src.url } : { src_file_id: src.id };
   if (step.feature === "fabric") return { template_id: step.fabricTemplateId, ...srcField };
   const ref = await asInput(step.refUrl!, origin);
@@ -242,6 +266,7 @@ async function buildBody(job: Job, step: Step, inputUrl: string, origin: string)
 function finish(job: Job) {
   job.done = true;
   job.finalUrl = prevOutput(job, job.steps.length);
+  job.sceneUrl = job.steps.find((s) => s.branch && s.outputUrl)?.outputUrl;
 }
 
 async function completeStep(job: Job, step: Step, url: string, cached: boolean) {
@@ -313,7 +338,8 @@ export async function advance(jobId: string, origin: string): Promise<Job> {
           const r = await getClient().pollTask(step.feature, step.taskId);
           const d = r.data;
           if (d.task_status === "success" && d.results?.url) {
-            const bytes = await readImage(d.results.url, origin);
+            let bytes = await readImage(d.results.url, origin);
+            if (step.crop && step.inputUrl) bytes = await compositeCrop(step.inputUrl, bytes, step.crop, origin);
             const url = await putImage(`mc/${selfie.id}/${step.cacheKey}.jpg`, bytes);
             await kv.set(`cache:${step.cacheKey}`, { url }, DAY);
             await kv.sadd(`selfie:${selfie.id}:cache`, step.cacheKey!);
@@ -352,10 +378,10 @@ function errText(e: unknown) {
 export function view(job: Job) {
   return {
     id: job.id, mode: job.mode, client: job.client, done: job.done, capHit: !!job.capHit, cursor: job.cursor,
-    sourceUrl: job.sourceUrl, finalUrl: job.finalUrl, skipped: job.skipped,
+    sourceUrl: job.sourceUrl, finalUrl: job.finalUrl, sceneUrl: job.sceneUrl, skipped: job.skipped,
     steps: job.steps.map((s) => ({
       sig: s.sig, kind: s.kind, feature: s.feature, productId: s.productId, variantId: s.variantId, fabricTemplateId: s.fabricTemplateId,
-      label: s.label, status: s.status, outputUrl: s.outputUrl, cached: !!s.cached, note: s.note,
+      label: s.label, status: s.status, outputUrl: s.outputUrl, cached: !!s.cached, note: s.note, branch: !!s.branch,
     })),
   };
 }

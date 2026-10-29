@@ -10,11 +10,11 @@ export type ModeInfo = {
 };
 export type StepView = {
   sig: string; kind: string; feature: string; productId: string; variantId: string; fabricTemplateId?: string;
-  label: string; status: "pending" | "running" | "done" | "error" | "skipped"; outputUrl?: string; cached: boolean; note?: string;
+  label: string; status: "pending" | "running" | "done" | "error" | "skipped"; outputUrl?: string; cached: boolean; note?: string; branch?: boolean;
 };
 export type JobView = {
   id: string; mode: "live" | "demo"; client: string; done: boolean; capHit: boolean; cursor: number;
-  sourceUrl: string; finalUrl?: string; skipped: { productId: string; variantId: string; reason: string }[]; steps: StepView[];
+  sourceUrl: string; finalUrl?: string; sceneUrl?: string; skipped: { productId: string; variantId: string; reason: string }[]; steps: StepView[];
 };
 export type Selfie = { id: string; url: string; demo: boolean };
 
