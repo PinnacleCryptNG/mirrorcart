@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Pebble Goods · a plain shop using the Mirrorcart embed</title>
+<style>
+  body { margin: 0; font: 16px/1.5 Georgia, "Times New Roman", serif; background: #fdfcf8; color: #222; }
+  header { padding: 18px 28px; border-bottom: 3px double #222; display: flex; justify-content: space-between; align-items: baseline; }
+  h1 { margin: 0; font-size: 26px; font-style: italic; }
+  main { max-width: 860px; margin: 0 auto; padding: 28px; }
+  .note { background: #fff6c8; border: 1px solid #e3d47a; padding: 10px 14px; font: 13px/1.5 ui-monospace, monospace; }
+  .row { display: grid; grid-template-columns: 220px 1fr; gap: 26px; margin: 28px 0; align-items: center; }
+  .row img { width: 100%; background: #eee; }
+  button[data-mirrorcart-tryon] { font: inherit; padding: 8px 16px; border: 1px solid #222; background: #fff; cursor: pointer; }
+  #log { font: 12px ui-monospace, monospace; background: #222; color: #9f9; padding: 12px; min-height: 60px; white-space: pre-wrap; }
+  code { background: #eee; padding: 1px 4px; }
+</style>
+</head>
+<body>
+<header><h1>Pebble Goods</h1><span>est. 2026 · a different, fictional shop</span></header>
+<main>
+  <p class="note">This is a plain static HTML page, not part of the Next.js store. It embeds Mirrorcart with one script tag:<br>
+  <code>&lt;script src="https://mirrorcart.vercel.app/widget.js" data-store="aurel-demo" async&gt;&lt;/script&gt;</code></p>
+
+  <div class="row">
+    <img src="/products/wrap-dress-sage.jpg" alt="Wrap dress in sage" />
+    <div>
+      <h2>The Sunday wrap dress</h2>
+      <p>Sage viscose crepe. $112 (demo).</p>
+      <button data-mirrorcart-tryon data-items='[{"id":"wrap-dress","variant":"sage"}]'>See it on me</button>
+    </div>
+  </div>
+  <div class="row">
+    <img src="/products/leather-tote-cognac.jpg" alt="Leather tote in cognac" />
+    <div>
+      <h2>Dress + loafers + tote bundle</h2>
+      <p>The whole look in one go.</p>
+      <button data-mirrorcart-tryon data-items='[{"id":"wrap-dress","variant":"terracotta"},{"id":"block-heel-loafers","variant":"black"},{"id":"leather-tote","variant":"cognac"}]'>See it on me</button>
+    </div>
+  </div>
+  <h3>Events received from the widget (postMessage)</h3>
+  <div id="log">Waiting…</div>
+</main>
+<script>
+  var log = document.getElementById("log"), first = true;
+  ["mirrorcart:checkout", "mirrorcart:remove-item", "mirrorcart:swap-item"].forEach(function (t) {
+    document.addEventListener(t, function (e) {
+      if (first) { log.textContent = ""; first = false; }
+      log.textContent += t + " " + JSON.stringify(e.detail) + "\n";
+    });
+  });
+</script>
+<script src="/widget.js" data-store="aurel-demo" async></script>
+</body>
+</html>
