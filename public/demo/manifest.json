@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "note": "Demo-mode looks. Keys are `<modelId>|<stepSig>>...`; each step signature is `<feature>:<productId>:<variantId>` or `fabric:<templateId>`. Regenerate with `npm run demo:generate`.",
+  "generatedWith": "none",
+  "models": [
+    { "id": "amara", "name": "Amara", "image": "/demo/models/amara.jpg", "gender": "female", "credit": "AI-generated fictional model" },
+    { "id": "mei", "name": "Mei", "image": "/demo/models/mei.jpg", "gender": "female", "credit": "AI-generated fictional model" },
+    { "id": "ravi", "name": "Ravi", "image": "/demo/models/ravi.jpg", "gender": "male", "credit": "AI-generated fictional model" }
+  ],
+  "outfits": [
+    { "id": "weekend", "title": "Weekend linen", "items": [{ "id": "linen-shirt", "variant": "sky" }, { "id": "wide-leg-trousers", "variant": "camel" }, { "id": "white-sneakers", "variant": "white" }, { "id": "leather-tote", "variant": "cognac" }] },
+    { "id": "dinner", "title": "Dinner wrap", "items": [{ "id": "wrap-dress", "variant": "terracotta" }, { "id": "block-heel-loafers", "variant": "black" }, { "id": "mini-crossbody", "variant": "cream" }, { "id": "gold-pendant", "variant": "pendant" }] },
+    { "id": "studio", "title": "Studio knit", "items": [{ "id": "ribbed-knit-top", "variant": "black" }, { "id": "pleated-midi-skirt", "variant": "sage" }, { "id": "block-heel-loafers", "variant": "tan" }, { "id": "mini-crossbody", "variant": "burgundy" }] }
+  ],
+  "looks": {}
+}
