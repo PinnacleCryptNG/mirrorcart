@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* Mirrorcart · "The Fitting Room": emerald velvet curtain, chrome mirror, brass hardware, coral price tag. */
+/* Mirrorcart · "The Fitting Room": emerald velvet, champagne gold, one rose accent, glossy rose squiggle mirrors. */
 :root {
   --ink: #0d1a15;
   --paper: #f7f9f7;
@@ -13,9 +13,9 @@
   --glass: #072b21;     /* deep emerald, used by the try-on modal */
   --velvet: #0f4434;
   --velvet-deep: #072b21;
-  --coral: #ff6b4a;
+  --coral: #d9467a;   /* rose: the one accent (token name kept) */
   --brass: #c9a24c;
-  --blush: #ff9fb5;
+  --blush: #f6a9c1;
 }
 
 @theme inline {
@@ -32,6 +32,7 @@
   --color-velvet-deep: var(--velvet-deep);
   --color-coral: var(--coral);
   --color-brass: var(--brass);
+  --color-blush: var(--blush);
   --font-display: var(--font-archivo);
   --font-sans: var(--font-hanken);
   --font-mono: var(--font-dmmono);
@@ -73,11 +74,11 @@ body { font-family: var(--font-hanken), system-ui, sans-serif; -webkit-font-smoo
 .mirror-rim { background:
   radial-gradient(60% 38% at 28% 12%, rgba(255,255,255,.45), transparent 60%),
   radial-gradient(60% 40% at 80% 92%, rgba(255,255,255,.55), transparent 65%),
-  linear-gradient(160deg, #ffd6df 0%, #ff9fb5 38%, #ff7e98 62%, #ffb3c3 100%); }
+  linear-gradient(160deg, #ffe4ec 0%, #f6a9c1 38%, #e46d96 62%, #f8cbd8 100%); }
 .mirror-glare { background:
-  linear-gradient(125deg, rgba(255,255,255,.28) 0%, rgba(255,255,255,0) 26%, rgba(255,255,255,0) 72%, rgba(255,214,224,.22) 100%);
-  box-shadow: inset 0 0 30px rgba(255, 140, 170, .25); }
-.group:hover .mirror { filter: drop-shadow(0 18px 30px rgba(255, 110, 150, .38)); transform: translateY(-3px) rotate(-.6deg); }
+  linear-gradient(125deg, rgba(255,255,255,.28) 0%, rgba(255,255,255,0) 26%, rgba(255,255,255,0) 72%, rgba(246,201,214,.24) 100%);
+  box-shadow: inset 0 0 0 1.5px rgba(243,213,143,.55), inset 0 0 30px rgba(228, 109, 150, .2); }
+.group:hover .mirror { filter: drop-shadow(0 18px 30px rgba(228, 109, 150, .38)); transform: translateY(-3px) rotate(-.6deg); }
 .twinkle { animation: twinkle 3.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
 @keyframes twinkle { 0%, 100% { opacity: 0; transform: scale(.4) rotate(0deg); } 45% { opacity: 1; transform: scale(1) rotate(45deg); } 70% { opacity: .2; } }
 .glow-pulse { animation: glow-pulse 4.5s ease-in-out infinite; }
@@ -85,7 +86,7 @@ body { font-family: var(--font-hanken), system-ui, sans-serif; -webkit-font-smoo
 
 /* Iridescent edge on the try-on widget */
 .mirror-edge {
-  background: conic-gradient(from var(--a, 0deg), #ff9fb5, #ffd6df, #ffffff, #e8c46c, #ff7e98, #ff9fb5);
+  background: conic-gradient(from var(--a, 0deg), #f6a9c1, #ffe4ec, #ffffff, #e8c46c, #e46d96, #f6a9c1);
   animation: spin-edge 7s linear infinite;
 }
 @property --a { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
@@ -125,8 +126,14 @@ body { font-family: var(--font-hanken), system-ui, sans-serif; -webkit-font-smoo
 
 .no-scrollbar { scrollbar-width: none; } .no-scrollbar::-webkit-scrollbar { display: none; }
 
+/* Glam: sparkle bursts as a piece lands, champagne dust drifting in the glass */
+.burst { opacity: 0; transform-box: fill-box; transform-origin: center; animation: burst 1.1s cubic-bezier(.2,.8,.3,1) forwards; }
+@keyframes burst { 0% { opacity: 0; transform: translate(0, 0) scale(.2); } 25% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1) rotate(90deg); } }
+.dust { opacity: 0; animation: dust var(--t, 7s) linear var(--d, 0s) infinite; }
+@keyframes dust { 0% { opacity: 0; transform: translateY(0); } 20% { opacity: .9; } 80% { opacity: .5; } 100% { opacity: 0; transform: translateY(-38px); } }
+
 @media (prefers-reduced-motion: reduce) {
-  .mirror-edge, .sheen::after, .twinkle, .glow-pulse, .float-slow, .marquee, .curtain-in, .rise, .reveal, .float, .tag-in, .group:hover .swing-tag { animation: none !important; }
+  .mirror-edge, .sheen::after, .twinkle, .burst, .dust, .glow-pulse, .float-slow, .marquee, .curtain-in, .rise, .reveal, .float, .tag-in, .group:hover .swing-tag { animation: none !important; }
   .curtain { display: none; }
 }
 

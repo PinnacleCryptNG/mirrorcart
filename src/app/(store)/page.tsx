@@ -8,24 +8,30 @@ import { Mirror } from "@/components/Mirror";
 
 const looks = (manifest as { looks: Record<string, string> }).looks;
 const HERO: HeroLook[] = [
-  { name: "Zola · dinner look", frames: [
-    { src: "/hero/zola.jpg", label: "Photo" },
-    { src: "/hero/zola-dinner-0.jpg", label: "+ Wrap dress", thumb: "/products/wrap-dress-terracotta.jpg", detail: "Terracotta · $112" },
-    { src: "/hero/zola-dinner-1.jpg", label: "+ Loafers", thumb: "/products/block-heel-loafers-black.jpg", detail: "Black · $118" },
-    { src: "/hero/zola-dinner-2.jpg", label: "+ Pendant", thumb: "/products/gold-pendant-pendant.jpg", detail: "Gold · $58" },
+  { name: "Look 01 · Dinner", pieces: [
+    { src: "/hero/cut/wrap-dress-terracotta.png", name: "Wrap dress", detail: "Terracotta · $112", price: 112, slot: "full" },
+    { src: "/hero/cut/block-heel-loafers-tan.png", name: "Loafers", detail: "Tan · $118", price: 118, slot: "shoes" },
+    { src: "/hero/cut/mini-crossbody-burgundy.png", name: "Mini crossbody", detail: "Burgundy · $98", price: 98, slot: "bag" },
+    { src: "/hero/cut/gold-pendant-pendant.png", name: "Gold pendant", detail: "Gold · $58", price: 58, slot: "necklace" },
   ] },
-  { name: "Zola · studio look", frames: [
-    { src: "/hero/zola.jpg", label: "Photo" },
-    { src: "/hero/zola-studio-0.jpg", label: "+ Knit top", thumb: "/products/ribbed-knit-top-black.jpg", detail: "Black · $42" },
-    { src: "/hero/zola-studio-1.jpg", label: "+ Midi skirt", thumb: "/products/pleated-midi-skirt-sage.jpg", detail: "Sage · $74" },
-    { src: "/hero/zola-studio-2.jpg", label: "+ Loafers", thumb: "/products/block-heel-loafers-tan.jpg", detail: "Tan · $118" },
+  { name: "Look 02 · Gallery", pieces: [
+    { src: "/hero/cut/jumpsuit-black.png", name: "Jumpsuit", detail: "Black · $128", price: 128, slot: "full" },
+    { src: "/hero/cut/block-heel-loafers-black.png", name: "Loafers", detail: "Black · $118", price: 118, slot: "shoes" },
+    { src: "/hero/cut/leather-tote-cognac.png", name: "Leather tote", detail: "Cognac · $165", price: 165, slot: "bag" },
+    { src: "/hero/cut/gold-pendant-hoops.png", name: "Gold hoops", detail: "Gold · $58", price: 58, slot: "necklace" },
+  ] },
+  { name: "Look 03 · Brunch", pieces: [
+    { src: "/hero/cut/wrap-dress-sage.png", name: "Wrap dress", detail: "Sage · $112", price: 112, slot: "full" },
+    { src: "/hero/cut/block-heel-loafers-tan.png", name: "Loafers", detail: "Tan · $118", price: 118, slot: "shoes" },
+    { src: "/hero/cut/mini-crossbody-cream.png", name: "Mini crossbody", detail: "Cream · $98", price: 98, slot: "bag" },
+    { src: "/hero/cut/gold-pendant-hoops.png", name: "Gold hoops", detail: "Gold · $58", price: 58, slot: "necklace" },
   ] },
 ];
 
 const STEPS = [
   { n: "01", t: "Fill your cart", d: "Pick a dress or a top and skirt, then shoes, a bag and jewellery. Mix colours and fabrics like you would in a store.", img: ["/products/wrap-dress-sage.jpg", "/products/block-heel-loafers-tan.jpg", "/products/mini-crossbody-cream.jpg"] },
   { n: "02", t: "Add one photo", d: "A full-length, front-facing photo works best. We frame it around you automatically, or you can use one of our sample models.", img: ["/demo/models/amara.jpg"] },
-  { n: "03", t: "See it all on you", d: "Each piece is put on in order, so you see one complete outfit. Swap a colour or fabric, remove what doesn't work, then check out.", img: [HERO[0].frames[3].src] },
+  { n: "03", t: "See it all on you", d: "Each piece is put on in order, so you see one complete outfit. Swap a colour or fabric, remove what doesn't work, then check out.", img: ["/hero/zola-dinner-2.jpg"] },
 ];
 
 export default function Home() {
@@ -44,7 +50,7 @@ export default function Home() {
               Mirrorcart is a fitting room for online shops. Add a dress, shoes and a bag, upload one photo, and see the <em>whole outfit on you</em>, not on a model.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
-              <Link href="#shop" className="rounded-full bg-coral px-7 py-3.5 font-semibold text-white shadow-[0_12px_30px_-10px_rgba(255,107,74,.8)] transition hover:-translate-y-0.5">Start with a dress</Link>
+              <Link href="#shop" className="rounded-full bg-coral px-7 py-3.5 font-semibold text-white shadow-[0_12px_30px_-10px_rgba(217,70,122,.8)] transition hover:-translate-y-0.5">Start with a dress</Link>
               <Link href="#how" className="rounded-full border border-white/30 px-6 py-3.5 transition hover:bg-white/10">How it works</Link>
             </div>
             <p className="mt-8 max-w-md border-l-2 border-lime/70 pl-4 text-sm text-white/65">

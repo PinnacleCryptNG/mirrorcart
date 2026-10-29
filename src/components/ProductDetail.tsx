@@ -39,7 +39,7 @@ export function ProductDetail({ product }: { product: Product }) {
         <div className="mt-8 flex flex-wrap items-center gap-3">
           <button
             onClick={() => { cart.add(product.id, v.id); setAdded(true); }}
-            className="rounded-full bg-coral px-8 py-3.5 font-semibold text-white shadow-[0_12px_30px_-12px_rgba(255,107,74,.9)] transition hover:-translate-y-0.5">
+            className="rounded-full bg-coral px-8 py-3.5 font-semibold text-white shadow-[0_12px_30px_-12px_rgba(217,70,122,.9)] transition hover:-translate-y-0.5">
             {added ? "Added ✓ Add another" : "Add to cart"}
           </button>
           {added && <Link href="/cart" className="rounded-full border border-ink/20 px-6 py-3.5 hover:bg-fog">Go to cart →</Link>}

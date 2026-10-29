@@ -18,7 +18,7 @@ export function MirrorMark({ className = "h-8 w-8", tone = "dark" }: { className
       <path d="M5 30V17.5a11 11 0 0 1 22 0V30z" fill={`url(#c${id})`} />
       <path d="M7.6 28.2V17.6a8.4 8.4 0 0 1 16.8 0v10.6z" fill={`url(#g${id})`} />
       <path d="M11 25.5l7.5-10M14.5 27l6-8" stroke="#ffffff" strokeOpacity=".7" strokeWidth="1.4" strokeLinecap="round" />
-      <circle cx="16" cy="28.9" r="1" fill="#ff6b4a" />
+      <circle cx="16" cy="28.9" r="1" fill="#d9467a" />
     </svg>
   );
 }

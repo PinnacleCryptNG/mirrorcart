@@ -26,7 +26,7 @@ export default async function OG() {
           <div style={{ display: "flex", fontSize: 26, color: "#cfe3d9" }}>One photo. Dress, shoes, bag & jewellery.</div>
         </div>
         <img src={mirror} alt="" width={412} height={582} style={{ position: "absolute", right: 90, top: 24, width: 412, height: 582 }} />
-        <div style={{ position: "absolute", right: 410, top: 110, display: "flex", background: "#ff6b4a", color: "#fff", fontSize: 24, fontWeight: 700, padding: "10px 18px", borderRadius: 999, transform: "rotate(-6deg)" }}>See it on me</div>
+        <div style={{ position: "absolute", right: 410, top: 110, display: "flex", background: "#d9467a", color: "#fff", fontSize: 24, fontWeight: 700, padding: "10px 18px", borderRadius: 999, transform: "rotate(-6deg)" }}>See it on me</div>
       </div>
     ),
     size,

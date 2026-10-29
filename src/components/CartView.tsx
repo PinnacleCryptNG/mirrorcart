@@ -44,7 +44,7 @@ export function CartView() {
           <aside className="h-fit rounded-3xl bg-ink p-6 text-white lg:sticky lg:top-28">
             <div className="flex justify-between font-mono text-sm"><span>Subtotal</span><span>{money(total)} <span className="text-white/50">pretend</span></span></div>
             <button onClick={() => setOpen(true)}
-              className="sheen mt-6 w-full rounded-full bg-coral px-6 py-4 font-display text-lg font-bold text-white shadow-[0_14px_34px_-12px_rgba(255,107,74,.9)] transition hover:scale-[1.01]">
+              className="sheen mt-6 w-full rounded-full bg-coral px-6 py-4 font-display text-lg font-bold text-white shadow-[0_14px_34px_-12px_rgba(217,70,122,.9)] transition hover:scale-[1.01]">
               See it on me
             </button>
             <p className="mt-3 text-xs text-white/60">Upload one photo (or pick a sample model) and see every item in your cart on you, in order: garments → shoes → bag → jewellery.</p>
