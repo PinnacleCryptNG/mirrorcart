@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { getVariant, money, SLOT_LABEL, slotOf } from "@/lib/catalog";
 import { cart, useCart } from "@/lib/cart";
 import { MirrorcartModal } from "@/components/mirrorcart/MirrorcartModal";
+import { Mirror } from "@/components/Mirror";
 
 export function CartView() {
   const items = useCart();
@@ -27,7 +28,7 @@ export function CartView() {
           <ul className="divide-y divide-line rounded-3xl bg-mist px-4 ring-1 ring-ink/5 sm:px-6">
             {rows.map(({ item, product, variant }) => (
               <li key={product.id + variant.id} className="flex items-center gap-3 py-4 sm:gap-4">
-                <div className="arch-sm relative h-24 w-20 shrink-0 overflow-hidden bg-paper"><Image src={variant.image} alt="" fill sizes="80px" className="object-contain p-2" /></div>
+                <Mirror ratio={1.2} rim={6} amp={3.5} waves={8} glass="bg-[#f0f0f0]" className="w-20 shrink-0"><Image src={variant.image} alt="" fill sizes="80px" className="object-contain p-3" /></Mirror>
                 <div className="min-w-0 flex-1">
                   <Link href={`/p/${product.id}`} className="font-display text-lg font-semibold hover:underline">{product.name}</Link>
                   <p className="text-sm text-muted">{variant.label} · qty {item.qty}</p>

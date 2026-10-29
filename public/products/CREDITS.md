@@ -28,4 +28,4 @@ No YouCam sample URLs are shipped in the product.
 |---|---|---|
 | `public/hero/zola.jpg` | AI-generated fictional model (no real person), generated for this project | Project-owned, MIT |
 | `public/hero/zola-*.jpg` | YouCam API try-on outputs (cloth-v4, shoes-transfer, 2d-vto/necklace) of the image above wearing this catalogue | Project-owned, MIT |
-| `public/hero/mirror-frame.png`, `mirror-glass.png` | AI-generated Art Deco mirror frame, generated for this project | Project-owned, MIT |
+| `public/hero/og-mirror.png` | Share-image render of the Mirrorcart squiggle mirror (drawn in code) with the try-on above | Project-owned, MIT |

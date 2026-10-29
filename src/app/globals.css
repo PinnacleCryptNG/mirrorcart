@@ -15,6 +15,7 @@
   --velvet-deep: #072b21;
   --coral: #ff6b4a;
   --brass: #c9a24c;
+  --blush: #ff9fb5;
 }
 
 @theme inline {
@@ -67,14 +68,24 @@ body { font-family: var(--font-hanken), system-ui, sans-serif; -webkit-font-smoo
 @keyframes open-l { to { transform: translateX(-96%) scaleX(.35); opacity: .0; } }
 @keyframes open-r { to { transform: translateX(96%) scaleX(.35); opacity: .0; } }
 
-/* Chrome mirror frame */
-.chrome { background: linear-gradient(135deg, #f7f8f6 0%, #93a19a 20%, #ffffff 36%, #74827c 54%, #eef2ef 70%, #a3afa9 86%, #f7f8f6 100%); }
-.arch { border-radius: 999px 999px 26px 26px; }
-.arch-sm { border-radius: 999px 999px 16px 16px; }
+/* The Mirrorcart mirror: glossy blush acrylic squiggle (see src/lib/mirror.ts) */
+.mirror { filter: drop-shadow(0 14px 22px rgba(120, 30, 60, .18)); transition: filter .5s, transform .5s; }
+.mirror-rim { background:
+  radial-gradient(60% 38% at 28% 12%, rgba(255,255,255,.45), transparent 60%),
+  radial-gradient(60% 40% at 80% 92%, rgba(255,255,255,.55), transparent 65%),
+  linear-gradient(160deg, #ffd6df 0%, #ff9fb5 38%, #ff7e98 62%, #ffb3c3 100%); }
+.mirror-glare { background:
+  linear-gradient(125deg, rgba(255,255,255,.28) 0%, rgba(255,255,255,0) 26%, rgba(255,255,255,0) 72%, rgba(255,214,224,.22) 100%);
+  box-shadow: inset 0 0 30px rgba(255, 140, 170, .25); }
+.group:hover .mirror { filter: drop-shadow(0 18px 30px rgba(255, 110, 150, .38)); transform: translateY(-3px) rotate(-.6deg); }
+.twinkle { animation: twinkle 3.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes twinkle { 0%, 100% { opacity: 0; transform: scale(.4) rotate(0deg); } 45% { opacity: 1; transform: scale(1) rotate(45deg); } 70% { opacity: .2; } }
+.glow-pulse { animation: glow-pulse 4.5s ease-in-out infinite; }
+@keyframes glow-pulse { 50% { opacity: .65; transform: scale(1.06); } }
 
 /* Iridescent edge on the try-on widget */
 .mirror-edge {
-  background: conic-gradient(from var(--a, 0deg), #e8c46c, #a8f0cf, #ffffff, #ff9f85, #e8c46c);
+  background: conic-gradient(from var(--a, 0deg), #ff9fb5, #ffd6df, #ffffff, #e8c46c, #ff7e98, #ff9fb5);
   animation: spin-edge 7s linear infinite;
 }
 @property --a { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
@@ -115,18 +126,9 @@ body { font-family: var(--font-hanken), system-ui, sans-serif; -webkit-font-smoo
 .no-scrollbar { scrollbar-width: none; } .no-scrollbar::-webkit-scrollbar { display: none; }
 
 @media (prefers-reduced-motion: reduce) {
-  .mirror-edge, .sheen::after, .marquee, .curtain-in, .rise, .reveal, .float, .tag-in, .group:hover .swing-tag { animation: none !important; }
+  .mirror-edge, .sheen::after, .twinkle, .glow-pulse, .float-slow, .marquee, .curtain-in, .rise, .reveal, .float, .tag-in, .group:hover .swing-tag { animation: none !important; }
   .curtain { display: none; }
 }
 
-/* Light catching the gilded mirror frame */
-.gold-glint {
-  -webkit-mask: url(/hero/mirror-frame.png) center / 100% 100% no-repeat; mask: url(/hero/mirror-frame.png) center / 100% 100% no-repeat;
-  background: linear-gradient(105deg, transparent 40%, rgba(255, 250, 225, .85) 50%, transparent 60%) 0 0 / 300% 100%;
-  mix-blend-mode: screen; animation: glint 5s ease-in-out infinite;
-}
-@keyframes glint { 0%, 50% { background-position: 100% 0; } 90%, 100% { background-position: 0 0; } }
 .float-slow { animation: float-slow 8s ease-in-out infinite; }
 @keyframes float-slow { 50% { transform: translateY(-8px); } }
-@media (prefers-reduced-motion: reduce) { .gold-glint, .float-slow { animation: none !important; } }
-.glass-mask { -webkit-mask: url(/hero/mirror-glass.png) center / 100% 100% no-repeat; mask: url(/hero/mirror-glass.png) center / 100% 100% no-repeat; }

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Product, SLOT_LABEL, money, slotOf } from "@/lib/catalog";
 import { cart } from "@/lib/cart";
+import { Mirror } from "@/components/Mirror";
 
 export function ProductDetail({ product }: { product: Product }) {
   const [vid, setVid] = useState(product.variants[0].id);
@@ -11,9 +12,11 @@ export function ProductDetail({ product }: { product: Product }) {
   const v = product.variants.find((x) => x.id === vid)!;
   return (
     <div className="mx-auto grid max-w-7xl gap-10 px-5 py-10 lg:grid-cols-[1.3fr_1fr]">
-      <div key={v.id} className="curtain-in arch relative aspect-[4/5] overflow-hidden bg-fog ring-1 ring-ink/5">
-        <Image src={v.image} alt={`${product.name} in ${v.label}`} fill priority sizes="(min-width:1024px) 55vw, 100vw" className="object-contain p-10 pt-16" />
-        <div className="sheen pointer-events-none absolute inset-0" />
+      <div key={v.id} className="curtain-in mx-auto w-full max-w-[640px]">
+        <Mirror ratio={1.25} rim={3} amp={2.4} waves={12} glass="bg-[#f0f0f0]">
+          <Image src={v.image} alt={`${product.name} in ${v.label}`} fill priority sizes="(min-width:1024px) 55vw, 100vw" className="object-contain p-12" />
+          <div className="sheen pointer-events-none absolute inset-0" />
+        </Mirror>
       </div>
       <div className="lg:pt-8">
         <Link href="/#shop" className="text-sm text-muted hover:text-ink">← Back to the edit</Link>

@@ -4,6 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { getVariant, money, SLOT_LABEL, slotOf } from "@/lib/catalog";
 import { api, Item, JobView } from "./api";
 import { btn, Filmstrip } from "./Stages";
+import { mirrorMasks } from "@/lib/mirror";
+
+const RM = mirrorMasks({ ratio: 4 / 3, rim: 3 });
 
 function BeforeAfter({ before, after }: { before: string; after: string }) {
   const [pos, setPos] = useState(55);
@@ -11,7 +14,9 @@ function BeforeAfter({ before, after }: { before: string; after: string }) {
   const drag = useRef(false);
   const move = (x: number) => { const r = box.current!.getBoundingClientRect(); setPos(Math.max(0, Math.min(100, ((x - r.left) / r.width) * 100))); };
   return (
-    <div ref={box} className="relative aspect-[3/4] w-full select-none overflow-hidden rounded-2xl border border-white/10 bg-black/40 touch-none"
+    <div className="mirror relative mx-auto aspect-[3/4] w-full max-w-[460px]">
+    <div className="mirror-rim absolute inset-0" style={RM.outer} />
+    <div ref={box} style={RM.inner} className="absolute inset-0 select-none overflow-hidden bg-black/40 touch-none"
       onPointerDown={(e) => { drag.current = true; (e.target as HTMLElement).setPointerCapture?.(e.pointerId); move(e.clientX); }}
       onPointerMove={(e) => drag.current && move(e.clientX)} onPointerUp={() => (drag.current = false)}>
       <img src={after} alt="After: wearing the look" className="absolute inset-0 h-full w-full object-contain" draggable={false} />
@@ -21,9 +26,10 @@ function BeforeAfter({ before, after }: { before: string; after: string }) {
       <div className="absolute inset-y-0 w-0.5 bg-lime" style={{ left: `${pos}%` }}>
         <span className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-lime px-2 py-1 font-mono text-[10px] text-lime-ink">◀ ▶</span>
       </div>
-      <span className="absolute left-3 top-3 rounded-full bg-black/60 px-2 py-0.5 font-mono text-[10px]">BEFORE</span>
-      <span className="absolute right-3 top-3 rounded-full bg-black/60 px-2 py-0.5 font-mono text-[10px]">AFTER</span>
+      <span className="absolute left-[20%] top-[12%] rounded-full bg-black/60 px-2 py-0.5 font-mono text-[10px]">BEFORE</span>
+      <span className="absolute right-[20%] top-[12%] rounded-full bg-black/60 px-2 py-0.5 font-mono text-[10px]">AFTER</span>
       <input type="range" min={0} max={100} value={pos} onChange={(e) => setPos(Number(e.target.value))} aria-label="Before/after slider" className="sr-only" />
+    </div>
     </div>
   );
 }

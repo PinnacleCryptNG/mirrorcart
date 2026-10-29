@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { getVariant, SLOT_LABEL, slotOf } from "@/lib/catalog";
 import { api, Item, JobView, ModeInfo, resizeToJpeg, Selfie, StepView } from "./api";
+import { Mirror } from "@/components/Mirror";
 
 const pill = "rounded-full px-5 py-2.5 text-sm font-medium transition disabled:opacity-40 disabled:cursor-not-allowed";
 export const btn = { primary: `${pill} bg-lime text-lime-ink hover:brightness-95`, ghost: `${pill} border border-white/25 hover:bg-white/10`, danger: `${pill} border border-red-300/40 text-red-200 hover:bg-red-500/15` };
@@ -88,7 +89,7 @@ export function PhotoStage(props: {
       <div>
         <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-lime">Step 2 · Your photo</p>
         <h2 className="mt-2 font-display text-3xl font-bold">Stand like a mannequin</h2>
-        <div className="relative mt-4 aspect-[3/4] overflow-hidden rounded-2xl border border-white/15 bg-black/40">
+        <Mirror ratio={4 / 3} rim={3} glass="bg-black/40" className="mx-auto mt-4 w-full max-w-[420px]">
           {cam ? <video ref={video} playsInline muted className="h-full w-full -scale-x-100 object-cover" /> :
             preview ? <img src={preview.url} alt="Your photo preview" className="h-full w-full object-contain" /> : (
               <svg viewBox="0 0 120 160" className="absolute inset-0 m-auto h-[85%] opacity-60" aria-hidden>
@@ -99,7 +100,7 @@ export function PhotoStage(props: {
               </svg>
             )}
           {!liveOk && <div className="absolute inset-0 grid place-items-center bg-black/70 p-6 text-center text-sm">Live upload is unavailable right now. Use a sample model →</div>}
-        </div>
+        </Mirror>
         <ul className="mt-3 grid grid-cols-3 gap-2 text-[11px] text-white/70">
           <li className="rounded-lg bg-white/5 p-2">Head to toe in frame</li><li className="rounded-lg bg-white/5 p-2">Face the camera, arms relaxed</li><li className="rounded-lg bg-white/5 p-2">Plain background, good light</li>
         </ul>
@@ -138,9 +139,9 @@ export function PhotoStage(props: {
         <div className="mt-4 grid grid-cols-3 gap-3">
           {(mode?.models ?? []).map((m) => (
             <button key={m.id} onClick={() => props.onSelfie({ id: `demo:${m.id}`, url: m.image, demo: true }, m.gender)}
-              className="group relative aspect-[3/5] overflow-hidden rounded-xl border border-white/15 hover:border-lime">
-              <img src={m.image} alt={m.name} className="h-full w-full object-cover transition group-hover:scale-105" />
-              <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 p-2 text-left text-sm">{m.name}</span>
+              className="group block">
+              <Mirror ratio={5 / 3} rim={5} amp={3.2} waves={10} glass="bg-black/40"><img src={m.image} alt={m.name} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" /></Mirror>
+              <span className="mt-2 block text-center text-sm">{m.name}</span>
             </button>
           ))}
         </div>

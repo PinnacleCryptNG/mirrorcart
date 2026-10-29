@@ -4,6 +4,7 @@ import manifest from "../../../public/demo/manifest.json";
 import { HeroMirror, HeroLook } from "@/components/home/HeroMirror";
 import { BeforeAfter } from "@/components/home/BeforeAfter";
 import { ShopGrid } from "@/components/home/ShopGrid";
+import { Mirror } from "@/components/Mirror";
 
 const looks = (manifest as { looks: Record<string, string> }).looks;
 const HERO: HeroLook[] = [
@@ -64,8 +65,10 @@ export default function Home() {
             <article key={s.n} className="reveal flex flex-col rounded-[28px] bg-mist p-6 ring-1 ring-ink/5">
               <div className="flex h-40 items-end justify-center gap-2">
                 {s.img.map((src, i) => (
-                  <div key={src} className={`arch-sm relative overflow-hidden bg-paper ring-1 ring-ink/10 ${s.img.length > 1 ? "h-28 w-20" : "h-40 w-28"}`} style={{ transform: s.img.length > 1 ? `rotate(${(i - 1) * 7}deg) translateY(${i === 1 ? -8 : 0}px)` : undefined }}>
-                    <Image src={src} alt="" fill sizes="120px" className={s.img.length > 1 ? "object-contain p-1.5" : "object-cover"} />
+                  <div key={src} className={s.img.length > 1 ? "w-20" : "w-28"} style={{ transform: s.img.length > 1 ? `rotate(${(i - 1) * 7}deg) translateY(${i === 1 ? -8 : 0}px)` : undefined }}>
+                    <Mirror ratio={1.42} rim={5.5} amp={3.4} waves={8} glass="bg-paper">
+                      <Image src={src} alt="" fill sizes="120px" className={s.img.length > 1 ? "object-contain p-2.5" : "object-cover"} />
+                    </Mirror>
                   </div>
                 ))}
               </div>

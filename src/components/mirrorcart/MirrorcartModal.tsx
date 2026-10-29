@@ -5,6 +5,7 @@ import { api, Item, JobView, ModeInfo, Selfie } from "./api";
 import { btn, ConsentStage, Filmstrip, PhotoStage, StepList } from "./Stages";
 import { ResultViewer } from "./ResultViewer";
 import { MirrorMark } from "@/components/Logo";
+import { Mirror } from "@/components/Mirror";
 
 type Stage = "consent" | "photo" | "running" | "result";
 
@@ -116,15 +117,15 @@ export function MirrorcartModal(p: MirrorcartProps) {
           )}
           {stage === "running" && job && (
             <div className="rise grid gap-6 lg:grid-cols-[1.1fr_1fr]">
-              <div className="relative aspect-[3/4] overflow-hidden rounded-2xl border border-white/10 bg-black/40">
+              <Mirror ratio={4 / 3} rim={3} glass="bg-black/40" className="mx-auto w-full max-w-[460px]">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img key={job.finalUrl || job.steps.findLast((s) => s.outputUrl)?.outputUrl || job.sourceUrl}
                   src={job.steps.findLast((s) => s.outputUrl)?.outputUrl || job.sourceUrl} alt="Current try-on" className="curtain-in h-full w-full object-contain" />
                 <div className="sheen absolute inset-0" />
-                <p className="absolute left-3 top-3 rounded-full bg-black/60 px-3 py-1 font-mono text-[10px] uppercase tracking-widest">
+                <p className="absolute left-1/2 top-[7%] -translate-x-1/2 whitespace-nowrap rounded-full bg-black/60 px-3 py-1 font-mono text-[10px] uppercase tracking-widest">
                   Chaining step {Math.min(job.cursor + 1, job.steps.length)} / {job.steps.length}
                 </p>
-              </div>
+              </Mirror>
               <div className="space-y-5">
                 <div><p className="font-mono text-[10px] uppercase tracking-[0.25em] text-lime">Step 3 · Dressing you</p>
                   <h2 className="mt-1 font-display text-3xl font-bold">Each result feeds the next</h2></div>
