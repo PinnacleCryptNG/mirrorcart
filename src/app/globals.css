@@ -118,3 +118,15 @@ body { font-family: var(--font-hanken), system-ui, sans-serif; -webkit-font-smoo
   .mirror-edge, .sheen::after, .marquee, .curtain-in, .rise, .reveal, .float, .tag-in, .group:hover .swing-tag { animation: none !important; }
   .curtain { display: none; }
 }
+
+/* Light catching the gilded mirror frame */
+.gold-glint {
+  -webkit-mask: url(/hero/mirror-frame.png) center / 100% 100% no-repeat; mask: url(/hero/mirror-frame.png) center / 100% 100% no-repeat;
+  background: linear-gradient(105deg, transparent 40%, rgba(255, 250, 225, .85) 50%, transparent 60%) 0 0 / 300% 100%;
+  mix-blend-mode: screen; animation: glint 5s ease-in-out infinite;
+}
+@keyframes glint { 0%, 50% { background-position: 100% 0; } 90%, 100% { background-position: 0 0; } }
+.float-slow { animation: float-slow 8s ease-in-out infinite; }
+@keyframes float-slow { 50% { transform: translateY(-8px); } }
+@media (prefers-reduced-motion: reduce) { .gold-glint, .float-slow { animation: none !important; } }
+.glass-mask { -webkit-mask: url(/hero/mirror-glass.png) center / 100% 100% no-repeat; mask: url(/hero/mirror-glass.png) center / 100% 100% no-repeat; }

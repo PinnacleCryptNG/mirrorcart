@@ -6,22 +6,19 @@ import { BeforeAfter } from "@/components/home/BeforeAfter";
 import { ShopGrid } from "@/components/home/ShopGrid";
 
 const looks = (manifest as { looks: Record<string, string> }).looks;
-const chain = (model: string, steps: { key: string; label: string; thumb: string; detail: string }[]) => {
-  let k = `${model}|`;
-  return steps.map((s, i) => { k += (i ? ">" : "") + s.key; return { src: looks[k], label: `+ ${s.label}`, thumb: s.thumb, detail: s.detail }; });
-};
-
 const HERO: HeroLook[] = [
-  { name: "Amara · dinner look", frames: [{ src: "/demo/models/amara.jpg", label: "Photo" }, ...chain("amara", [
-    { key: "cloth-v4:wrap-dress:terracotta", label: "Wrap dress", thumb: "/products/wrap-dress-terracotta.jpg", detail: "Terracotta · $112" },
-    { key: "shoes-transfer:block-heel-loafers:black", label: "Loafers", thumb: "/products/block-heel-loafers-black.jpg", detail: "Black · $118" },
-    { key: "2d-vto/necklace:gold-pendant:pendant", label: "Pendant", thumb: "/products/gold-pendant-pendant.jpg", detail: "Gold · $58" },
-  ])] },
-  { name: "Mei · studio look", frames: [{ src: "/demo/models/mei.jpg", label: "Photo" }, ...chain("mei", [
-    { key: "cloth-v4:ribbed-knit-top:black", label: "Knit top", thumb: "/products/ribbed-knit-top-black.jpg", detail: "Black · $42" },
-    { key: "cloth-v4:pleated-midi-skirt:sage", label: "Midi skirt", thumb: "/products/pleated-midi-skirt-sage.jpg", detail: "Sage · $74" },
-    { key: "shoes-transfer:block-heel-loafers:tan", label: "Loafers", thumb: "/products/block-heel-loafers-tan.jpg", detail: "Tan · $118" },
-  ])] },
+  { name: "Zola · dinner look", frames: [
+    { src: "/hero/zola.jpg", label: "Photo" },
+    { src: "/hero/zola-dinner-0.jpg", label: "+ Wrap dress", thumb: "/products/wrap-dress-terracotta.jpg", detail: "Terracotta · $112" },
+    { src: "/hero/zola-dinner-1.jpg", label: "+ Loafers", thumb: "/products/block-heel-loafers-black.jpg", detail: "Black · $118" },
+    { src: "/hero/zola-dinner-2.jpg", label: "+ Pendant", thumb: "/products/gold-pendant-pendant.jpg", detail: "Gold · $58" },
+  ] },
+  { name: "Zola · studio look", frames: [
+    { src: "/hero/zola.jpg", label: "Photo" },
+    { src: "/hero/zola-studio-0.jpg", label: "+ Knit top", thumb: "/products/ribbed-knit-top-black.jpg", detail: "Black · $42" },
+    { src: "/hero/zola-studio-1.jpg", label: "+ Midi skirt", thumb: "/products/pleated-midi-skirt-sage.jpg", detail: "Sage · $74" },
+    { src: "/hero/zola-studio-2.jpg", label: "+ Loafers", thumb: "/products/block-heel-loafers-tan.jpg", detail: "Tan · $118" },
+  ] },
 ];
 
 const STEPS = [
@@ -31,13 +28,13 @@ const STEPS = [
 ];
 
 export default function Home() {
-  const after = HERO[1].frames[3].src;
+  const after = looks["mei|cloth-v4:ribbed-knit-top:black>cloth-v4:pleated-midi-skirt:sage>shoes-transfer:block-heel-loafers:tan"];
   return (
     <>
       {/* HERO: the fitting room */}
       <section className="velvet relative overflow-hidden text-white">
         <div className="curtain l" /><div className="curtain r" />
-        <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 pb-16 pt-12 lg:grid-cols-[1.05fr_1fr] lg:pb-24 lg:pt-20">
+        <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 pb-14 pt-10 lg:grid-cols-[1.1fr_1fr] lg:pb-16 lg:pt-14">
           <div className="rise">
             <h1 className="font-display text-[clamp(2.7rem,7.2vw,6.2rem)] font-extrabold leading-[0.92] tracking-[-0.045em]">
               Try the whole<br />cart on.<br /><span className="serif-i text-[1.08em] text-lime">Before you pay.</span>

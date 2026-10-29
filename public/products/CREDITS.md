@@ -21,3 +21,11 @@ All product and model images in this repository were **generated for this projec
 | `fabrics/*.svg` | Mock fabric swatches used only by the mock YouCam client | Drawn in code for this project | MIT (this repo) |
 
 No YouCam sample URLs are shipped in the product.
+
+## Landing-page hero
+
+| File | Source | Licence |
+|---|---|---|
+| `public/hero/zola.jpg` | AI-generated fictional model (no real person), generated for this project | Project-owned, MIT |
+| `public/hero/zola-*.jpg` | YouCam API try-on outputs (cloth-v4, shoes-transfer, 2d-vto/necklace) of the image above wearing this catalogue | Project-owned, MIT |
+| `public/hero/mirror-frame.png`, `mirror-glass.png` | AI-generated Art Deco mirror frame, generated for this project | Project-owned, MIT |
