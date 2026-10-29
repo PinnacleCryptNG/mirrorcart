@@ -1,16 +1,134 @@
 {
   "version": 1,
   "note": "Demo-mode looks. Keys are `<modelId>|<stepSig>>...`; each step signature is `<feature>:<productId>:<variantId>` or `fabric:<templateId>`. Regenerate with `npm run demo:generate`.",
-  "generatedWith": "none",
+  "generatedWith": "youcam",
   "models": [
-    { "id": "amara", "name": "Amara", "image": "/demo/models/amara.jpg", "gender": "female", "credit": "AI-generated fictional model" },
-    { "id": "mei", "name": "Mei", "image": "/demo/models/mei.jpg", "gender": "female", "credit": "AI-generated fictional model" },
-    { "id": "ravi", "name": "Ravi", "image": "/demo/models/ravi.jpg", "gender": "male", "credit": "AI-generated fictional model" }
+    {
+      "id": "amara",
+      "name": "Amara",
+      "image": "/demo/models/amara.jpg",
+      "gender": "female",
+      "credit": "AI-generated fictional model"
+    },
+    {
+      "id": "mei",
+      "name": "Mei",
+      "image": "/demo/models/mei.jpg",
+      "gender": "female",
+      "credit": "AI-generated fictional model"
+    },
+    {
+      "id": "ravi",
+      "name": "Ravi",
+      "image": "/demo/models/ravi.jpg",
+      "gender": "male",
+      "credit": "AI-generated fictional model"
+    }
   ],
   "outfits": [
-    { "id": "weekend", "title": "Weekend linen", "items": [{ "id": "linen-shirt", "variant": "sky" }, { "id": "wide-leg-trousers", "variant": "camel" }, { "id": "white-sneakers", "variant": "white" }, { "id": "leather-tote", "variant": "cognac" }] },
-    { "id": "dinner", "title": "Dinner wrap", "items": [{ "id": "wrap-dress", "variant": "terracotta" }, { "id": "block-heel-loafers", "variant": "black" }, { "id": "mini-crossbody", "variant": "cream" }, { "id": "gold-pendant", "variant": "pendant" }] },
-    { "id": "studio", "title": "Studio knit", "items": [{ "id": "ribbed-knit-top", "variant": "black" }, { "id": "pleated-midi-skirt", "variant": "sage" }, { "id": "block-heel-loafers", "variant": "tan" }, { "id": "mini-crossbody", "variant": "burgundy" }] }
+    {
+      "id": "weekend",
+      "title": "Weekend linen",
+      "items": [
+        {
+          "id": "linen-shirt",
+          "variant": "sky"
+        },
+        {
+          "id": "wide-leg-trousers",
+          "variant": "camel"
+        },
+        {
+          "id": "white-sneakers",
+          "variant": "white"
+        },
+        {
+          "id": "leather-tote",
+          "variant": "cognac"
+        }
+      ]
+    },
+    {
+      "id": "dinner",
+      "title": "Dinner wrap",
+      "items": [
+        {
+          "id": "wrap-dress",
+          "variant": "terracotta"
+        },
+        {
+          "id": "block-heel-loafers",
+          "variant": "black"
+        },
+        {
+          "id": "mini-crossbody",
+          "variant": "cream"
+        },
+        {
+          "id": "gold-pendant",
+          "variant": "pendant"
+        }
+      ]
+    },
+    {
+      "id": "studio",
+      "title": "Studio knit",
+      "items": [
+        {
+          "id": "ribbed-knit-top",
+          "variant": "black"
+        },
+        {
+          "id": "pleated-midi-skirt",
+          "variant": "sage"
+        },
+        {
+          "id": "block-heel-loafers",
+          "variant": "tan"
+        },
+        {
+          "id": "mini-crossbody",
+          "variant": "burgundy"
+        }
+      ]
+    }
   ],
-  "looks": {}
+  "looks": {
+    "amara|cloth-v4:linen-shirt:sky": "/demo/looks/amara/cloth-v4-linen-shirt-sky.jpg",
+    "amara|cloth-v4:linen-shirt:sky>cloth-v4:wide-leg-trousers:camel": "/demo/looks/amara/cloth-v4-linen-shirt-sky__cloth-v4-wide-leg-trousers-camel.jpg",
+    "amara|cloth-v4:linen-shirt:sky>cloth-v4:wide-leg-trousers:camel>shoes-transfer:white-sneakers:white": "/demo/looks/amara/cloth-v4-linen-shirt-sky__cloth-v4-wide-leg-trousers-camel__shoes-transfer-white-sneakers-white.jpg",
+    "amara|cloth-v4:linen-shirt:sky>cloth-v4:wide-leg-trousers:camel>shoes-transfer:white-sneakers:white>bag:leather-tote:cognac": "/demo/looks/amara/cloth-v4-linen-shirt-sky__cloth-v4-wide-leg-trousers-camel__shoes-transfer-white-sneakers-white__bag-leather-tote-cognac.jpg",
+    "amara|cloth-v4:wrap-dress:terracotta": "/demo/looks/amara/cloth-v4-wrap-dress-terracotta.jpg",
+    "amara|cloth-v4:wrap-dress:terracotta>shoes-transfer:block-heel-loafers:black": "/demo/looks/amara/cloth-v4-wrap-dress-terracotta__shoes-transfer-block-heel-loafers-black.jpg",
+    "amara|cloth-v4:wrap-dress:terracotta>shoes-transfer:block-heel-loafers:black>2d-vto/necklace:gold-pendant:pendant": "/demo/looks/amara/cloth-v4-wrap-dress-terracotta__shoes-transfer-block-heel-loafers-black__2d-vto-necklace-gold-pendant-pendant.jpg",
+    "amara|cloth-v4:wrap-dress:terracotta>shoes-transfer:block-heel-loafers:black>2d-vto/necklace:gold-pendant:pendant>bag:mini-crossbody:cream": "/demo/looks/amara/ress-terracotta__shoes-transfer-block-heel-loafers-black__2d-vto-necklace-gold-pendant-pendant__bag-mini-crossbody-cream.jpg",
+    "amara|cloth-v4:ribbed-knit-top:black": "/demo/looks/amara/cloth-v4-ribbed-knit-top-black.jpg",
+    "amara|cloth-v4:ribbed-knit-top:black>cloth-v4:pleated-midi-skirt:sage": "/demo/looks/amara/cloth-v4-ribbed-knit-top-black__cloth-v4-pleated-midi-skirt-sage.jpg",
+    "amara|cloth-v4:ribbed-knit-top:black>cloth-v4:pleated-midi-skirt:sage>shoes-transfer:block-heel-loafers:tan": "/demo/looks/amara/cloth-v4-ribbed-knit-top-black__cloth-v4-pleated-midi-skirt-sage__shoes-transfer-block-heel-loafers-tan.jpg",
+    "amara|cloth-v4:ribbed-knit-top:black>cloth-v4:pleated-midi-skirt:sage>shoes-transfer:block-heel-loafers:tan>bag:mini-crossbody:burgundy": "/demo/looks/amara/bed-knit-top-black__cloth-v4-pleated-midi-skirt-sage__shoes-transfer-block-heel-loafers-tan__bag-mini-crossbody-burgundy.jpg",
+    "mei|cloth-v4:linen-shirt:sky": "/demo/looks/mei/cloth-v4-linen-shirt-sky.jpg",
+    "mei|cloth-v4:linen-shirt:sky>cloth-v4:wide-leg-trousers:camel": "/demo/looks/mei/cloth-v4-linen-shirt-sky__cloth-v4-wide-leg-trousers-camel.jpg",
+    "mei|cloth-v4:linen-shirt:sky>cloth-v4:wide-leg-trousers:camel>shoes-transfer:white-sneakers:white": "/demo/looks/mei/cloth-v4-linen-shirt-sky__cloth-v4-wide-leg-trousers-camel__shoes-transfer-white-sneakers-white.jpg",
+    "mei|cloth-v4:linen-shirt:sky>cloth-v4:wide-leg-trousers:camel>shoes-transfer:white-sneakers:white>bag:leather-tote:cognac": "/demo/looks/mei/cloth-v4-linen-shirt-sky__cloth-v4-wide-leg-trousers-camel__shoes-transfer-white-sneakers-white__bag-leather-tote-cognac.jpg",
+    "mei|cloth-v4:wrap-dress:terracotta": "/demo/looks/mei/cloth-v4-wrap-dress-terracotta.jpg",
+    "mei|cloth-v4:wrap-dress:terracotta>shoes-transfer:block-heel-loafers:black": "/demo/looks/mei/cloth-v4-wrap-dress-terracotta__shoes-transfer-block-heel-loafers-black.jpg",
+    "mei|cloth-v4:wrap-dress:terracotta>shoes-transfer:block-heel-loafers:black>2d-vto/necklace:gold-pendant:pendant": "/demo/looks/mei/cloth-v4-wrap-dress-terracotta__shoes-transfer-block-heel-loafers-black__2d-vto-necklace-gold-pendant-pendant.jpg",
+    "mei|cloth-v4:wrap-dress:terracotta>shoes-transfer:block-heel-loafers:black>2d-vto/necklace:gold-pendant:pendant>bag:mini-crossbody:cream": "/demo/looks/mei/ress-terracotta__shoes-transfer-block-heel-loafers-black__2d-vto-necklace-gold-pendant-pendant__bag-mini-crossbody-cream.jpg",
+    "mei|cloth-v4:ribbed-knit-top:black": "/demo/looks/mei/cloth-v4-ribbed-knit-top-black.jpg",
+    "mei|cloth-v4:ribbed-knit-top:black>cloth-v4:pleated-midi-skirt:sage": "/demo/looks/mei/cloth-v4-ribbed-knit-top-black__cloth-v4-pleated-midi-skirt-sage.jpg",
+    "mei|cloth-v4:ribbed-knit-top:black>cloth-v4:pleated-midi-skirt:sage>shoes-transfer:block-heel-loafers:tan": "/demo/looks/mei/cloth-v4-ribbed-knit-top-black__cloth-v4-pleated-midi-skirt-sage__shoes-transfer-block-heel-loafers-tan.jpg",
+    "mei|cloth-v4:ribbed-knit-top:black>cloth-v4:pleated-midi-skirt:sage>shoes-transfer:block-heel-loafers:tan>bag:mini-crossbody:burgundy": "/demo/looks/mei/bed-knit-top-black__cloth-v4-pleated-midi-skirt-sage__shoes-transfer-block-heel-loafers-tan__bag-mini-crossbody-burgundy.jpg",
+    "ravi|cloth-v4:linen-shirt:sky": "/demo/looks/ravi/cloth-v4-linen-shirt-sky.jpg",
+    "ravi|cloth-v4:linen-shirt:sky>cloth-v4:wide-leg-trousers:camel": "/demo/looks/ravi/cloth-v4-linen-shirt-sky__cloth-v4-wide-leg-trousers-camel.jpg",
+    "ravi|cloth-v4:linen-shirt:sky>cloth-v4:wide-leg-trousers:camel>shoes-transfer:white-sneakers:white": "/demo/looks/ravi/cloth-v4-linen-shirt-sky__cloth-v4-wide-leg-trousers-camel__shoes-transfer-white-sneakers-white.jpg",
+    "ravi|cloth-v4:linen-shirt:sky>cloth-v4:wide-leg-trousers:camel>shoes-transfer:white-sneakers:white>bag:leather-tote:cognac": "/demo/looks/ravi/cloth-v4-linen-shirt-sky__cloth-v4-wide-leg-trousers-camel__shoes-transfer-white-sneakers-white__bag-leather-tote-cognac.jpg",
+    "ravi|cloth-v4:wrap-dress:terracotta": "/demo/looks/ravi/cloth-v4-wrap-dress-terracotta.jpg",
+    "ravi|cloth-v4:wrap-dress:terracotta>shoes-transfer:block-heel-loafers:black": "/demo/looks/ravi/cloth-v4-wrap-dress-terracotta__shoes-transfer-block-heel-loafers-black.jpg",
+    "ravi|cloth-v4:wrap-dress:terracotta>shoes-transfer:block-heel-loafers:black>2d-vto/necklace:gold-pendant:pendant": "/demo/looks/ravi/cloth-v4-wrap-dress-terracotta__shoes-transfer-block-heel-loafers-black__2d-vto-necklace-gold-pendant-pendant.jpg",
+    "ravi|cloth-v4:wrap-dress:terracotta>shoes-transfer:block-heel-loafers:black>2d-vto/necklace:gold-pendant:pendant>bag:mini-crossbody:cream": "/demo/looks/ravi/ress-terracotta__shoes-transfer-block-heel-loafers-black__2d-vto-necklace-gold-pendant-pendant__bag-mini-crossbody-cream.jpg",
+    "ravi|cloth-v4:ribbed-knit-top:black": "/demo/looks/ravi/cloth-v4-ribbed-knit-top-black.jpg",
+    "ravi|cloth-v4:ribbed-knit-top:black>cloth-v4:pleated-midi-skirt:sage": "/demo/looks/ravi/cloth-v4-ribbed-knit-top-black__cloth-v4-pleated-midi-skirt-sage.jpg",
+    "ravi|cloth-v4:ribbed-knit-top:black>cloth-v4:pleated-midi-skirt:sage>shoes-transfer:block-heel-loafers:tan": "/demo/looks/ravi/cloth-v4-ribbed-knit-top-black__cloth-v4-pleated-midi-skirt-sage__shoes-transfer-block-heel-loafers-tan.jpg",
+    "ravi|cloth-v4:ribbed-knit-top:black>cloth-v4:pleated-midi-skirt:sage>shoes-transfer:block-heel-loafers:tan>bag:mini-crossbody:burgundy": "/demo/looks/ravi/bed-knit-top-black__cloth-v4-pleated-midi-skirt-sage__shoes-transfer-block-heel-loafers-tan__bag-mini-crossbody-burgundy.jpg"
+  }
 }

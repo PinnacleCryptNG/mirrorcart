@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { existsSync } from "node:fs";
 // Pre-generates demo-mode looks: for every sample model × featured outfit, runs the real chain
 // against a running Mirrorcart server (mock or live YouCam), saves each step's output under
 // public/demo/looks/ and writes the chain → image mapping into public/demo/manifest.json.
@@ -28,7 +29,14 @@ for (const model of manifest.models) {
   const up = await (await fetch(BASE + "/api/photo/upload", { method: "POST", body: form })).json();
   if (!up.selfieId) throw new Error("upload failed: " + JSON.stringify(up));
   for (const outfit of manifest.outfits) {
-    const { jobId } = await post("/api/tryon/start", { selfieId: up.selfieId, gender: model.gender, items: outfit.items, store: "demo-generator", rerun: true });
+    const { jobId, job: planned } = await post("/api/tryon/start", { selfieId: up.selfieId, gender: model.gender, items: outfit.items, store: "demo-generator", rerun: true });
+    const relFor = (sigs) => `/demo/looks/${model.id}/${sigs.map((x) => x.replace(/[^a-z0-9]+/gi, "-")).join("__").slice(-120)}.jpg`;
+    const plannedRels = planned.steps.map((_, i) => relFor(planned.steps.slice(0, i + 1).map((s) => s.sig)));
+    if (plannedRels.every((rel) => existsSync(path.join(root, "public", rel)))) {
+      plannedRels.forEach((rel, i) => (looks[`${model.id}|${planned.steps.slice(0, i + 1).map((s) => s.sig).join(">")}`] = rel));
+      console.log(`= ${model.id} × ${outfit.id}: already generated, reused`);
+      continue;
+    }
     let job;
     for (;;) {
       job = (await post("/api/tryon/step", { jobId })).job;
@@ -41,7 +49,7 @@ for (const model of manifest.models) {
       if (s.status !== "done" || !s.outputUrl) { console.warn(`  ${model.id}/${outfit.id} step ${i} ${s.status}: ${s.note || ""}`); continue; }
       const url = s.outputUrl.startsWith("/") ? BASE + s.outputUrl : s.outputUrl;
       const bytes = Buffer.from(await (await fetch(url)).arrayBuffer());
-      const rel = `/demo/looks/${model.id}/${sigs.map((x) => x.replace(/[^a-z0-9]+/gi, "-")).join("__").slice(-120)}.jpg`;
+      const rel = relFor(sigs);
       await mkdir(path.dirname(path.join(root, "public", rel)), { recursive: true });
       await writeFile(path.join(root, "public", rel), bytes);
       looks[`${model.id}|${sigs.join(">")}`] = rel;
