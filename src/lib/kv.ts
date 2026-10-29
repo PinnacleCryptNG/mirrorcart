@@ -13,7 +13,8 @@ const redis = url && token ? new Redis({ url, token }) : null;
 type Entry = { v: unknown; exp?: number };
 const g = globalThis as unknown as { __mcMem?: Map<string, Entry> };
 const mem = (g.__mcMem ??= new Map());
-const P = "mc:";
+// Local dev shares the Upstash DB with production, so keep its keys apart from real events.
+const P = process.env.VERCEL ? "mc:" : "mc-dev:";
 
 function memGet(k: string): Entry | undefined {
   const e = mem.get(k);

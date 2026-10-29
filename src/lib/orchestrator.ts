@@ -317,7 +317,8 @@ export async function advance(jobId: string, origin: string): Promise<Job> {
             const url = await putImage(`mc/${selfie.id}/${step.cacheKey}.jpg`, bytes);
             await kv.set(`cache:${step.cacheKey}`, { url }, DAY);
             await kv.sadd(`selfie:${selfie.id}:cache`, step.cacheKey!);
-            await Promise.all([kv.incrby(`units:${today()}`, UNIT_COST[step.feature], 2 * DAY), kv.hincrby("stats", "units_used", UNIT_COST[step.feature]), kv.hincrby("stats", "live_steps")]);
+            if (getClient().kind === "mock") await kv.hincrby("stats", "mock_steps");
+            else await Promise.all([kv.incrby(`units:${today()}`, UNIT_COST[step.feature], 2 * DAY), kv.hincrby("stats", "units_used", UNIT_COST[step.feature]), kv.hincrby("stats", "live_steps")]);
             await completeStep(job, step, url, false);
           } else if (d.task_status === "error") {
             fallBackToPrevious(job, step, `YouCam: ${d.error || d.error_message || "error"}`);
