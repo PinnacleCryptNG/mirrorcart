@@ -2,7 +2,7 @@ import "server-only";
 import { createHash, randomUUID } from "crypto";
 import sharp from "sharp";
 import { kv } from "@/lib/kv";
-import { putImage, readImage } from "@/lib/blob";
+import { deleteImages, putImage, readImage } from "@/lib/blob";
 import { config } from "@/lib/config";
 import { Feature, FabricTemplate, YouCamClient } from "./types";
 
@@ -83,7 +83,11 @@ export const mockClient: YouCamClient = {
     return { status: 200, data: { task_status: "success", results: { url: t.url } } };
   },
 
-  async deleteTask(id) { await kv.del(`mocktask:${id}`); },
+  async deleteTask(id) {
+    const t = await kv.get<MockTask>(`mocktask:${id}`);
+    if (t?.url) await deleteImages([t.url]);
+    await kv.del(`mocktask:${id}`);
+  },
 
   async listFabricTemplates() {
     return { status: 200, data: { templates: MOCK_FABRICS } };

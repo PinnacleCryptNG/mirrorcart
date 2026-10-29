@@ -2,6 +2,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { getVariant, money, SLOT_LABEL, slotOf } from "@/lib/catalog";
 import { cart, useCart } from "@/lib/cart";
 import { MirrorcartModal } from "@/components/mirrorcart/MirrorcartModal";
@@ -9,6 +10,7 @@ import { MirrorcartModal } from "@/components/mirrorcart/MirrorcartModal";
 export function CartView() {
   const items = useCart();
   const [open, setOpen] = useState(false);
+  const router = useRouter();
   const rows = items.map((i) => ({ item: i, ...getVariant(i.productId, i.variantId)! })).filter((r) => r.product);
   const total = rows.reduce((n, r) => n + r.product.price * r.item.qty, 0);
 
@@ -47,7 +49,17 @@ export function CartView() {
           </aside>
         </div>
       )}
-      {open && <MirrorcartModal items={items} onClose={() => setOpen(false)} />}
+      {open && (
+        <MirrorcartModal
+          items={items.map((i) => ({ id: i.productId, variant: i.variantId, fabric: i.fabricTemplateId }))}
+          onClose={() => setOpen(false)}
+          onRemove={(it) => cart.remove(it.id, it.variant)}
+          onSwap={(it, v) => it.variant && cart.setVariant(it.id, it.variant, v)}
+          onFabric={(it, f) => it.variant && cart.setFabric(it.id, it.variant, f)}
+          onReplaceItems={(next) => cart.replace(next.map((n) => ({ productId: n.id, variantId: n.variant || getVariant(n.id)!.variant.id, fabricTemplateId: n.fabric, qty: items.find((x) => x.productId === n.id)?.qty ?? 1 })))}
+          onCheckout={() => router.push("/checkout")}
+        />
+      )}
     </div>
   );
 }
