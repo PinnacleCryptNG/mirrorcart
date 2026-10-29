@@ -72,6 +72,8 @@ export function ResultViewer(p: {
 
   useEffect(() => { if (open?.what === "fabric" && !fabrics) api.fabrics().then((r) => setFabrics(r.templates)).catch(() => setFabrics([])); }, [open, fabrics]);
 
+  const done = job.steps.filter((s) => s.status === "done");
+  const saved = job.mode === "live" ? done.filter((s) => s.cached).length : 0;
   const total = items.reduce((n, i) => n + (getVariant(i.id, i.variant)?.product.price ?? 0), 0);
 
   function remove(it: Item) {
@@ -94,6 +96,11 @@ export function ResultViewer(p: {
   return (
     <div className="rise grid gap-6 lg:grid-cols-[1.1fr_1fr]">
       <div className="space-y-3">
+        {saved > 0 && (
+          <p className="saved-tag mx-auto w-fit rounded-full px-4 py-1.5 font-mono text-[10px] uppercase tracking-[0.2em]">
+            ✦ {saved === done.length ? "Saved look" : `${saved} of ${done.length} steps saved`} · 0 credits
+          </p>
+        )}
         <BeforeAfter before={job.sourceUrl} after={shown} />
         <Filmstrip job={job} active={pick ?? lastMain} onPick={setPick} />
         {job.sceneUrl && (
@@ -125,7 +132,7 @@ export function ResultViewer(p: {
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium">{pv.product.name} · {pv.variant.label}</p>
                     <p className="font-mono text-[10px] text-white/50">{SLOT_LABEL[slotOf(pv.product, pv.variant)]} · {money(pv.product.price)} demo
-                      {step ? ` · ${step.status === "done" ? (step.cached ? "on you (cached)" : "on you") : step.note || step.status}` : skipped ? ` · ${skipped.reason}` : ""}
+                      {step ? ` · ${step.status === "done" ? (step.cached && job.mode === "live" ? "on you · saved, 0 credits" : "on you") : step.note || step.status}` : skipped ? ` · ${skipped.reason}` : ""}
                       {fabStep ? ` · fabric ${fabStep.status === "done" ? "applied" : fabStep.note || fabStep.status}` : ""}</p>
                   </div>
                 </div>
@@ -160,7 +167,7 @@ export function ResultViewer(p: {
             );
           })}
         </ul>
-        <p className="text-xs text-white/50">Swaps re-run only from the changed step; earlier steps come from cache (0 units).</p>
+        <p className="text-xs text-white/50">Swaps re-run only from the changed step; earlier steps are saved, so they cost 0 credits.</p>
         <div className="flex items-center justify-between border-t border-white/10 pt-4">
           <span className="font-mono text-sm">{money(total)} <span className="text-white/50">demo</span></span>
           <button className={btn.primary} onClick={() => p.onCheckout(items)}>Checkout with confidence →</button>

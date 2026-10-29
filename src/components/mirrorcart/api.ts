@@ -16,7 +16,8 @@ export type JobView = {
   id: string; mode: "live" | "demo"; client: string; done: boolean; capHit: boolean; cursor: number;
   sourceUrl: string; finalUrl?: string; sceneUrl?: string; skipped: { productId: string; variantId: string; reason: string }[]; steps: StepView[];
 };
-export type Selfie = { id: string; url: string; demo: boolean };
+export type Selfie = { id: string; url: string; demo: boolean; matched?: boolean };
+export type SavedLook = { items: Item[]; thumb: string; labels: string[]; t: number };
 
 async function post<T>(url: string, body: unknown): Promise<T> {
   const r = await fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
@@ -28,7 +29,7 @@ async function post<T>(url: string, body: unknown): Promise<T> {
 export const api = {
   mode: () => fetch("/api/mode", { cache: "no-store" }).then((r) => r.json() as Promise<ModeInfo>),
   fabrics: () => fetch("/api/fabrics").then((r) => r.json() as Promise<{ templates: { id: string; thumb: string; title?: string }[] }>),
-  async upload(blob: Blob): Promise<{ selfieId: string; url: string }> {
+  async upload(blob: Blob): Promise<{ selfieId: string; url: string; matched: boolean }> {
     const f = new FormData();
     f.set("consent", "yes");
     f.set("photo", blob, "photo.jpg");
@@ -39,6 +40,8 @@ export const api = {
   },
   start: (b: { selfieId: string; items: Item[]; gender?: string; store: string; rerun?: boolean }) => post<{ jobId: string; job: JobView }>("/api/tryon/start", b),
   step: (jobId: string) => post<{ job: JobView }>("/api/tryon/step", { jobId }),
+  looks: (selfieId: string) =>
+    fetch(`/api/photo/looks?selfieId=${encodeURIComponent(selfieId)}`, { cache: "no-store" }).then((r) => r.json() as Promise<{ looks: SavedLook[] }>),
   deletePhoto: (selfieId: string, store: string) => post<{ deleted: boolean }>("/api/photo/delete", { selfieId, store }),
   track: (type: string, store: string, items?: { id: string; variant?: string }[]) =>
     post("/api/events", { type, store, items }).catch(() => undefined),

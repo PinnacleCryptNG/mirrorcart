@@ -51,6 +51,8 @@ Upstash Redis: jobs, cache index, events, daily unit counter      Vercel Blob: s
 
 Swapping a variant or fabric re-runs only from the changed step; earlier steps come from cache.
 
+**Photo memory.** On upload the server also stores a 24 × 32 normalised grey-scale print of the photo. A re-saved or re-compressed copy of the same picture (e.g. sent over WhatsApp) is recognised and reuses the original photo's results, so a repeat look costs 0 units. The match is strict: a new pose, a crop or a different person is treated as a new photo. Every finished look is kept for 24 h and shown in the try-on as **Your fitting room**; reopening one is served from saved results (0 units, even when live mode is paused by the credit caps). "Delete my photo" removes every copy recognised as the same picture, its results and its saved looks.
+
 ## Photo framing
 
 YouCam's clothes VTO wants one front-facing person filling at least 80% of the frame. Uploads run through MediaPipe Pose in the browser (wasm and model self-hosted in `public/mediapipe/`). The photo is cropped to 3:4 around the person and warns about a missing face or feet, or more than one person, before any units are spent. `cloth-v4` runs with `change_shoes:false` so the shopper keeps her own shoes unless the cart has shoes. A small subject in a wide photo used to change the face and drop a hijab; framing fixed both in live tests.

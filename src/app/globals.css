@@ -147,3 +147,13 @@ body { font-family: var(--font-hanken), system-ui, sans-serif; -webkit-font-smoo
 
 .float-slow { animation: float-slow 8s ease-in-out infinite; }
 @keyframes float-slow { 50% { transform: translateY(-8px); } }
+
+.saved-tag {
+  color: #072b21;
+  background: linear-gradient(100deg, #c9a24c, #f3d58f 45%, #e8c46c 60%, #c9a24c);
+  background-size: 220% 100%;
+  box-shadow: 0 8px 24px -10px rgba(232, 196, 108, .8);
+  animation: saved-shine 3.2s ease-in-out infinite;
+}
+@keyframes saved-shine { 0%, 100% { background-position: 100% 0; } 50% { background-position: 0 0; } }
+@media (prefers-reduced-motion: reduce) { .saved-tag { animation: none; } }

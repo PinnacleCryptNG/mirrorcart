@@ -77,7 +77,7 @@ export function PhotoStage(props: {
     setBusy(true); setErr("");
     try {
       const r = await api.upload(preview.blob);
-      props.onSelfie({ id: r.selfieId, url: r.url, demo: false }, gender || undefined);
+      props.onSelfie({ id: r.selfieId, url: r.url, demo: false, matched: r.matched }, gender || undefined);
     } catch (e) {
       const m = (e as Error).message;
       setErr(m === "demo_only" ? "Live try-on is paused (daily cap). Pick a sample model." : `Upload failed: ${m}`);
@@ -170,7 +170,7 @@ export function StepList({ job }: { job: JobView }) {
           </span>
           <div className="min-w-0 flex-1">
             <p className="truncate"><span className="text-white/50">{stepLabel(s)} · </span>{s.label}</p>
-            <p className="font-mono text-[10px] text-white/40">/task/{s.feature}{s.cached ? " · cached, 0 units" : ""}{s.note ? ` · ${s.note}` : ""}</p>
+            <p className="font-mono text-[10px] text-white/40">/task/{s.feature}{s.cached ? " · saved, 0 credits" : ""}{s.note ? ` · ${s.note}` : ""}</p>
           </div>
         </li>
       ))}

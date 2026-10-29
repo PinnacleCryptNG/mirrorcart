@@ -38,12 +38,16 @@ export type Step = {
   crop?: { left: number; top: number; width: number; height: number };
 };
 
-export type Selfie = { id: string; hash: string; url: string; createdAt: number; demo?: boolean };
+export type Selfie = { id: string; hash: string; url: string; createdAt: number; demo?: boolean; /** Recognised as a photo already uploaded in the last 24 h. */ matched?: boolean };
+
+/** A finished look, remembered per photo for the "Your fitting room" strip (24 h). */
+export type SavedLook = { key: string; items: ChainItem[]; thumb: string; labels: string[]; t: number };
 
 export type Job = {
   id: string;
   /** Hashed client IP, for the per-visitor daily unit limit. */
   visitor?: string;
+  items?: ChainItem[];
   /** Swap/fabric re-runs of an earlier try-on; excluded from started/completed funnel counts. */
   rerun?: boolean;
   store: string;
@@ -172,12 +176,66 @@ export async function modeStatus() {
 
 /* ---------- selfies ---------- */
 
+/* ---------- photo memory ---------- */
+
+type PhotoPrint = { p: string; h: string; ar: number; t: number };
+const PRINTS = "photo:prints";
+const PW = 24, PH = 32, BLOCK = 4;
+
+/** Normalised 24 × 32 grey-scale thumbnail (int8, base64) plus aspect ratio. */
+async function photoPrint(bytes: Buffer) {
+  const img = sharp(bytes).rotate();
+  const meta = await img.metadata();
+  const raw = await img.grayscale().resize(PW, PH, { fit: "fill" }).blur(0.8).raw().toBuffer();
+  const mean = raw.reduce((s, x) => s + x, 0) / raw.length;
+  const sd = Math.sqrt(raw.reduce((s, x) => s + (x - mean) ** 2, 0) / raw.length) || 1;
+  const q = Int8Array.from(raw, (x) => Math.max(-127, Math.min(127, Math.round(((x - mean) / sd) * 32))));
+  const w = meta.autoOrient?.width ?? meta.width ?? 1, h = meta.autoOrient?.height ?? meta.height ?? 1;
+  return { p: Buffer.from(q.buffer).toString("base64"), ar: w / h };
+}
+
+/**
+ * Same picture = near-perfect overall correlation and no region that differs (so a re-saved or
+ * re-compressed copy matches, but a new pose, a crop or a changed garment does not).
+ */
+function samePicture(a: string, b: string) {
+  const x = new Int8Array(Buffer.from(a, "base64")), y = new Int8Array(Buffer.from(b, "base64"));
+  if (x.length !== PW * PH || y.length !== x.length) return false;
+  let c = 0, xx2 = 0, yy2 = 0;
+  for (let i = 0; i < x.length; i++) { c += x[i] * y[i]; xx2 += x[i] * x[i]; yy2 += y[i] * y[i]; }
+  if (c / Math.sqrt(xx2 * yy2 || 1) < 0.995) return false;
+  for (let by = 0; by < PH; by += BLOCK) for (let bx = 0; bx < PW; bx += BLOCK) {
+    let d = 0;
+    for (let yy = by; yy < by + BLOCK; yy++) for (let xx = bx; xx < bx + BLOCK; xx++) d += Math.abs(x[yy * PW + xx] - y[yy * PW + xx]);
+    if (d / (BLOCK * BLOCK) / 32 > 0.15) return false;
+  }
+  return true;
+}
+
+async function recentPrints() {
+  const cutoff = Date.now() - DAY * 1000;
+  return ((await kv.get<PhotoPrint[]>(PRINTS)) ?? []).filter((e) => e.t > cutoff);
+}
+
+/** Finds an upload of the same picture in the last 24 h so its saved results are reused (0 units). */
+async function matchPhoto(bytes: Buffer, exact: string) {
+  const print = await photoPrint(bytes).catch(() => null);
+  const prints = await recentPrints();
+  const hit = prints.find((e) => e.h === exact) ??
+    (print ? prints.find((e) => Math.abs(e.ar - print.ar) / print.ar < 0.01 && samePicture(e.p, print.p)) : undefined);
+  if (!hit && print) await kv.set(PRINTS, [...prints, { ...print, h: exact, t: Date.now() }].slice(-150), DAY);
+  return hit?.h;
+}
+
 export async function saveSelfie(bytes: Buffer, contentType: string): Promise<Selfie> {
   const id = randomUUID();
-  const hash = sha(bytes.toString("base64"));
+  const exact = sha(bytes.toString("base64"));
+  const known = await matchPhoto(bytes, exact);
+  const hash = known ?? exact;
   const url = await putImage(`mc/${id}/selfie.jpg`, bytes, contentType);
-  const s: Selfie = { id, hash, url, createdAt: Date.now() };
+  const s: Selfie = { id, hash, url, createdAt: Date.now(), ...(known ? { matched: true } : {}) };
   await kv.set(`selfie:${id}`, s, DAY);
+  await kv.sadd(`photo:${hash}:selfies`, id);
   await kv.zadd("retention:selfies", s.createdAt, id);
   return s;
 }
@@ -190,9 +248,48 @@ export async function getSelfie(id: string): Promise<Selfie | null> {
   return kv.get<Selfie>(`selfie:${id}`);
 }
 
-/** Purge our copies (Blob + cache index + jobs) and ask YouCam to delete the tasks made from this photo. */
-export async function purgeSelfie(id: string) {
+const looksKey = (selfie: Selfie, visitor?: string) => (selfie.demo ? `looks:${selfie.hash}:${visitor ?? "anon"}` : `looks:${selfie.hash}`);
+const itemsKey = (items: ChainItem[]) =>
+  JSON.stringify([...items].map((i) => [i.id, i.variant ?? "", i.fabric ?? ""]).sort());
+
+async function rememberLook(job: Job, selfie: Selfie) {
+  if (!job.items?.length || !job.finalUrl || job.finalUrl === job.sourceUrl) return;
+  const k = looksKey(selfie, job.visitor);
+  const key = itemsKey(job.items);
+  const labels = job.steps.filter((s) => s.kind !== "fabric" && s.status === "done").map((s) => s.label);
+  const prev = ((await kv.get<SavedLook[]>(k)) ?? []).filter((l) => l.key !== key);
+  await kv.set(k, [{ key, items: job.items, thumb: job.finalUrl, labels, t: Date.now() }, ...prev].slice(0, 8), DAY);
+}
+
+/** Looks already made from this photo (newest first). Reopening one is served from cache. */
+export async function savedLooks(selfieId: string, visitor?: string) {
+  const selfie = await getSelfie(selfieId);
+  if (!selfie) return [];
+  return (await kv.get<SavedLook[]>(looksKey(selfie, visitor))) ?? [];
+}
+
+/**
+ * "Delete my photo": purges this upload and every other upload recognised as the same picture,
+ * so no saved result made from it survives. Retention sweeps pass cascade=false.
+ */
+export async function purgeSelfie(id: string, cascade = true) {
   if (id.startsWith("demo:")) return { deleted: false, reason: "demo model" };
+  const s = await kv.get<Selfie>(`selfie:${id}`);
+  const ids = new Set([id, ...(cascade && s ? await kv.smembers(`photo:${s.hash}:selfies`) : [])]);
+  const out = { deleted: true, cacheEntries: 0, youcamTasksDeleted: 0, youcamTasks: 0 };
+  for (const x of ids) {
+    const r = await purgeUpload(x);
+    out.cacheEntries += r.cacheEntries; out.youcamTasksDeleted += r.youcamTasksDeleted; out.youcamTasks += r.youcamTasks;
+  }
+  if (cascade && s) {
+    await kv.del(`photo:${s.hash}:selfies`, `looks:${s.hash}`);
+    const prints = await recentPrints();
+    await kv.set(PRINTS, prints.filter((e) => e.h !== s.hash), DAY);
+  }
+  return out;
+}
+
+async function purgeUpload(id: string) {
   const [cacheKeys, tasks, jobs] = await Promise.all([
     kv.smembers(`selfie:${id}:cache`), kv.smembers(`selfie:${id}:tasks`), kv.smembers(`selfie:${id}:jobs`),
   ]);
@@ -204,7 +301,7 @@ export async function purgeSelfie(id: string) {
   for (const t of tasks) {
     try { await client.deleteTask(t); remoteDeleted++; } catch { /* already gone or still running */ }
   }
-  return { deleted: true, cacheEntries: cacheKeys.length, youcamTasksDeleted: remoteDeleted, youcamTasks: tasks.length };
+  return { cacheEntries: cacheKeys.length, youcamTasksDeleted: remoteDeleted, youcamTasks: tasks.length };
 }
 
 /* ---------- jobs ---------- */
@@ -214,13 +311,13 @@ export async function startJob(opts: { selfieId: string; items: ChainItem[]; gen
   if (!selfie) throw new Error("photo_not_found");
   const status = await modeStatus();
   const demo = !!selfie.demo || !!opts.forceDemo;
-  if (!demo && status.demoOnly) throw Object.assign(new Error("demo_only"), { reason: status.reason });
   const { steps, skipped } = planChain(opts.items);
   if (!steps.length) throw new Error("nothing_to_try_on");
+  if (!demo && status.demoOnly && !(await fullyCached(selfie.hash, steps))) throw Object.assign(new Error("demo_only"), { reason: status.reason });
   let gender = opts.gender;
   if (!gender && selfie.demo) gender = (await getManifest()).models.find((m) => `demo:${m.id}` === selfie.id)?.gender;
   const job: Job = {
-    id: randomUUID(), rerun: !!opts.rerun, visitor: opts.visitor, store: opts.store || "aurel-demo", selfieId: selfie.id, mode: demo ? "demo" : "live",
+    id: randomUUID(), rerun: !!opts.rerun, visitor: opts.visitor, items: opts.items, store: opts.store || "aurel-demo", selfieId: selfie.id, mode: demo ? "demo" : "live",
     client: demo ? "demo" : getClient().kind, gender: gender || "female", steps, skipped, cursor: 0, done: false,
     createdAt: Date.now(), sourceUrl: selfie.url,
   };
@@ -237,9 +334,15 @@ function prevOutput(job: Job, i: number) {
   return job.sourceUrl;
 }
 
-function cacheKeyFor(selfieHash: string, job: Job, i: number) {
+function cacheKeyFor(selfieHash: string, job: Pick<Job, "steps">, i: number) {
   const prefix = job.steps.slice(0, i).map((s) => s.sig).join(">");
   return sha(`${selfieHash}|${prefix}|${job.steps[i].sig}`);
+}
+
+/** True when every step of this look is already saved, so it can be shown even with live try-on paused. */
+async function fullyCached(selfieHash: string, steps: Step[]) {
+  for (let i = 0; i < steps.length; i++) if (!(await kv.get(`cache:${cacheKeyFor(selfieHash, { steps }, i)}`))) return false;
+  return true;
 }
 
 function needsUpload(url: string) {
@@ -397,6 +500,7 @@ export async function advance(jobId: string, origin: string): Promise<Job> {
       }
     }
     if (job.done && !job.rerun) await track("tryon_completed", { store: job.store });
+    if (job.done) await rememberLook(job, selfie);
     await saveJob(job);
     return job;
   } finally {

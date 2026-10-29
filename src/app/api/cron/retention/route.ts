@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
   const cutoff = Date.now() - config.retentionHours * 3600_000;
   const ids = await kv.zrangeByScore("retention:selfies", cutoff);
   let purged = 0;
-  for (const id of ids.slice(0, 200)) { await purgeSelfie(id); purged++; }
+  for (const id of ids.slice(0, 200)) { await purgeSelfie(id, false); purged++; }
   const orphanBlobs = await deleteOlderThan("mc/", cutoff);
   return json({ ok: true, purgedSelfies: purged, orphanBlobsDeleted: orphanBlobs, cutoff: new Date(cutoff).toISOString() });
 }

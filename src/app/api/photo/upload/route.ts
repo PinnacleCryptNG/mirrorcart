@@ -16,5 +16,5 @@ export async function POST(req: NextRequest) {
   if (file.size > MAX_BYTES) return json({ error: "photo_too_large" }, 413);
   if (!/^image\/(jpeg|jpg|png)$/.test(file.type)) return json({ error: "jpeg_or_png_only" }, 415);
   const s = await saveSelfie(Buffer.from(await file.arrayBuffer()), file.type === "image/png" ? "image/png" : "image/jpeg");
-  return json({ selfieId: s.id, url: s.url, expiresAt: s.createdAt + 86_400_000 });
+  return json({ selfieId: s.id, url: s.url, matched: !!s.matched, expiresAt: s.createdAt + 86_400_000 });
 }

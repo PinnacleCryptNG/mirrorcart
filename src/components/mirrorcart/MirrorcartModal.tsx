@@ -1,9 +1,10 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getVariant, slotOf } from "@/lib/catalog";
-import { api, Item, JobView, ModeInfo, Selfie } from "./api";
+import { api, Item, JobView, ModeInfo, SavedLook, Selfie } from "./api";
 import { btn, ConsentStage, Filmstrip, PhotoStage, StepList } from "./Stages";
 import { ResultViewer } from "./ResultViewer";
+import { FittingRoom } from "./FittingRoom";
 import { MirrorMark } from "@/components/Logo";
 import { Mirror } from "@/components/Mirror";
 
@@ -37,6 +38,7 @@ export function MirrorcartModal(p: MirrorcartProps) {
   const [gender, setGender] = useState<"female" | "male" | undefined>();
   const [job, setJob] = useState<JobView | null>(null);
   const [toast, setToast] = useState("");
+  const [looks, setLooks] = useState<SavedLook[]>([]);
   const alive = useRef(true);
   const runId = useRef(0);
 
@@ -67,6 +69,7 @@ export function MirrorcartModal(p: MirrorcartProps) {
       if (my !== runId.current || !alive.current) return;
       sessionStorage.setItem("mc-tried-on", "1");
       setStage("result");
+      api.looks(s.id).then((r) => alive.current && my === runId.current && setLooks(r.looks)).catch(() => {});
     } catch (e) {
       const m = (e as Error).message;
       setToast(m === "demo_only" ? REASON.cap_reached : m === "photo_not_found" ? "Your photo was deleted. Add a new one." : `Try-on failed: ${m}`);
@@ -79,7 +82,7 @@ export function MirrorcartModal(p: MirrorcartProps) {
     if (!selfie || selfie.demo) { setSelfie(null); setJob(null); setStage("photo"); return; }
     runId.current++;
     await api.deletePhoto(selfie.id, store);
-    setSelfie(null); setJob(null); setStage("photo");
+    setSelfie(null); setJob(null); setLooks([]); setStage("photo");
     setToast("Your photo and every try-on made from it were deleted.");
   }
 
@@ -113,7 +116,11 @@ export function MirrorcartModal(p: MirrorcartProps) {
           {stage === "photo" && (
             <PhotoStage mode={mode} needsGender={needsGender}
               onLoadOutfit={(o) => { updateItems(o); setToast("Outfit loaded into your cart."); }}
-              onSelfie={(s, g) => { setSelfie(s); setGender(g); run(s, items, g); }} />
+              onSelfie={(s, g) => {
+                setSelfie(s); setGender(g); setLooks([]);
+                if (s.matched) setToast("Welcome back: we recognised this photo, so any look you've already tried loads instantly at 0 credits.");
+                run(s, items, g);
+              }} />
           )}
           {stage === "running" && job && (
             <div className="rise grid gap-6 lg:grid-cols-[1.1fr_1fr]">
@@ -139,6 +146,9 @@ export function MirrorcartModal(p: MirrorcartProps) {
               onRerun={(next) => { updateItems(next); run(selfie, next, gender, true); }}
               onRemove={(it) => p.onRemove?.(it)} onSwap={(it, v) => p.onSwap?.(it, v)} onFabric={(it, f) => p.onFabric?.(it, f)}
               onCheckout={(list) => p.onCheckout?.(list)} />
+          )}
+          {stage === "result" && selfie && looks.length > 1 && (
+            <FittingRoom looks={looks} current={items} onOpen={(next) => { updateItems(next); run(selfie, next, gender, true); }} />
           )}
         </div>
       </div>
