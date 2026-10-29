@@ -1,38 +1,34 @@
 "use client";
 import Link from "next/link";
 import { useCart } from "@/lib/cart";
+import { MirrorcartLogo } from "@/components/Logo";
 
+/** The demo boutique's own name, in plain type (fictional brand, no logo). */
 export function Wordmark({ className = "" }: { className?: string }) {
-  return (
-    <span className={`font-display font-extrabold tracking-[-0.04em] leading-none ${className}`}>
-      AUREL<span className="mx-[0.12em] inline-block -translate-y-[0.05em] text-[0.8em] font-medium">&amp;</span>THREAD
-    </span>
-  );
+  return <span className={`serif-i leading-none ${className}`}>Aurel &amp; Thread</span>;
 }
 
 export function StoreHeader() {
   const items = useCart();
   const count = items.reduce((n, i) => n + i.qty, 0);
   return (
-    <header className="sticky top-0 z-30 border-b border-ink bg-paper/90 backdrop-blur">
-      <div className="overflow-hidden border-b border-ink bg-ink py-1 text-[10px] uppercase tracking-[0.2em] text-paper font-mono">
-        <div className="marquee flex w-max gap-10 whitespace-nowrap">
-          {Array.from({ length: 2 }).map((_, k) => (
-            <span key={k} className="flex gap-10">
-              <span>Demo store · prices are mock</span><span className="text-lime">● Try the whole cart on with Mirrorcart</span>
-              <span>Fictional brand · no real logos</span><span>One photo → full outfit</span>
-              <span className="text-lime">● Swap fabric inline</span><span>Photos auto-deleted within 24 h</span>
-            </span>
-          ))}
-        </div>
+    <header className="sticky top-0 z-40 border-b border-ink/10 bg-paper/85 backdrop-blur-md">
+      <div className="bg-velvet-deep px-4 py-1.5 text-center text-[11px] text-white/80">
+        <span className="hidden sm:inline">You&apos;re in <b className="font-semibold text-lime">Aurel &amp; Thread</b>, a pretend boutique for trying Mirrorcart. Nothing is for sale · photos auto-delete within 24 h</span>
+        <span className="sm:hidden">Demo boutique · nothing is for sale · photos deleted in 24 h</span>
       </div>
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4">
-        <Link href="/" aria-label="Aurel & Thread home"><Wordmark className="text-2xl sm:text-3xl" /></Link>
-        <nav className="flex items-center gap-5 text-sm">
-          <Link href="/#shop" className="hidden sm:inline hover:underline underline-offset-4">Shop</Link>
-          <Link href="/dashboard" className="hidden sm:inline hover:underline underline-offset-4">Retailer dashboard</Link>
-          <Link href="/cart" className="flex items-center gap-2 rounded-full border border-ink px-4 py-1.5 hover:bg-ink hover:text-paper transition-colors">
-            Cart <span className="font-mono text-xs">[{count}]</span>
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3">
+        <Link href="/" aria-label="Mirrorcart home" className="flex min-w-0 items-baseline gap-3">
+          <MirrorcartLogo className="text-[22px] sm:text-2xl" />
+          <span className="hidden truncate text-sm text-muted md:inline">at <Wordmark className="text-[17px] text-ink" /></span>
+        </Link>
+        <nav className="flex items-center gap-1 text-sm sm:gap-2">
+          <Link href="/#shop" className="hidden rounded-full px-3 py-2 hover:bg-fog sm:inline">Shop</Link>
+          <Link href="/#how" className="hidden rounded-full px-3 py-2 hover:bg-fog lg:inline">How it works</Link>
+          <Link href="/#retailers" className="hidden rounded-full px-3 py-2 hover:bg-fog lg:inline">For shops</Link>
+          <Link href="/cart" className="ml-1 flex items-center gap-2 rounded-full bg-ink py-2 pl-4 pr-2 text-paper transition hover:bg-velvet">
+            Cart
+            <span className={`grid h-6 min-w-6 place-items-center rounded-full px-1.5 font-mono text-xs ${count ? "bg-coral text-white" : "bg-white/15"}`}>{count}</span>
           </Link>
         </nav>
       </div>
@@ -42,21 +38,25 @@ export function StoreHeader() {
 
 export function StoreFooter() {
   return (
-    <footer className="mt-24 border-t border-ink">
-      <div className="tape h-3 opacity-60" />
-      <div className="mx-auto grid max-w-7xl gap-8 px-5 py-12 sm:grid-cols-3">
-        <div><Wordmark className="text-xl" /><p className="mt-3 max-w-xs text-sm text-muted">A fictional label built to demo Mirrorcart for the YouCam API Hackathon. Nothing here is for sale.</p></div>
-        <div className="text-sm space-y-1">
-          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted">Mirrorcart</p>
-          <Link className="block hover:underline" href="/dashboard">Retailer dashboard</Link>
-          <a className="block hover:underline" href="/embed-demo.html">Embed on another shop</a>
-          <Link className="block hover:underline" href="/privacy">Privacy &amp; retention</Link>
+    <footer className="velvet-deep mt-24 text-white/80">
+      <div className="mx-auto grid max-w-7xl gap-10 px-5 py-14 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr]">
+        <div>
+          <MirrorcartLogo tone="light" className="text-2xl text-white" />
+          <p className="mt-4 max-w-sm text-sm leading-relaxed">A fitting room for online checkout. Shoppers see their whole cart on themselves before they pay, and shops get fewer &ldquo;it looked different on me&rdquo; returns.</p>
+          <p className="mt-3 text-xs text-white/50">Built for the YouCam API Hackathon. Aurel &amp; Thread is fictional; prices are pretend.</p>
         </div>
-        <div className="text-sm space-y-1">
-          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted">Credits</p>
-          <a className="block hover:underline" href="https://github.com/PinnacleCryptNG/mirrorcart">Source (MIT)</a>
-          <a className="block hover:underline" href="https://github.com/PinnacleCryptNG/mirrorcart/blob/main/public/products/CREDITS.md">Image credits</a>
-          <p className="text-muted">Try-on powered by the YouCam API (Perfect Corp.)</p>
+        <div className="space-y-2 text-sm">
+          <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-lime">Product</p>
+          <Link className="block hover:text-white" href="/#how">How it works</Link>
+          <Link className="block hover:text-white" href="/dashboard">Retailer dashboard</Link>
+          <a className="block hover:text-white" href="/embed-demo.html">Embed on another shop</a>
+          <Link className="block hover:text-white" href="/privacy">Privacy &amp; photo deletion</Link>
+        </div>
+        <div className="space-y-2 text-sm">
+          <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-lime">Open source</p>
+          <a className="block hover:text-white" href="https://github.com/PinnacleCryptNG/mirrorcart">Source code (MIT)</a>
+          <a className="block hover:text-white" href="https://github.com/PinnacleCryptNG/mirrorcart/blob/main/public/products/CREDITS.md">Image credits</a>
+          <p className="text-white/50">Try-on by the YouCam API (Perfect Corp.)</p>
         </div>
       </div>
     </footer>

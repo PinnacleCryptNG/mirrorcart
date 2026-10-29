@@ -57,7 +57,7 @@
     b.type = "button";
     b.setAttribute("aria-label", "See it on me with Mirrorcart");
     b.innerHTML = '<span style="display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#fff,#9be7ff);color:#101014;font:800 12px system-ui;margin-right:8px">M</span>See it on me';
-    css(b, { position: "fixed", right: "20px", bottom: "20px", zIndex: "2147483645", display: "flex", alignItems: "center", padding: "12px 18px 12px 12px", borderRadius: "999px", border: "2px solid #c6f432", background: "#0f0f13", color: "#fff", font: "600 15px system-ui,sans-serif", cursor: "pointer", boxShadow: "0 8px 30px rgba(0,0,0,.25)" });
+    css(b, { position: "fixed", right: "20px", bottom: "20px", zIndex: "2147483645", display: "flex", alignItems: "center", padding: "12px 18px 12px 12px", borderRadius: "999px", border: "2px solid #e8c46c", background: "#0f4434", color: "#fff", font: "600 15px system-ui,sans-serif", cursor: "pointer", boxShadow: "0 8px 30px rgba(0,0,0,.25)" });
     b.onclick = function () { open(); };
     document.body.appendChild(b);
   }

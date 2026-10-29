@@ -51,7 +51,7 @@ export function Dashboard(props: { data: Data; names: Record<string, string>; ca
         <div className="flex items-center gap-4"><Link href="/"><Wordmark className="text-lg" /></Link><span className="font-mono text-[11px] uppercase tracking-widest text-lime">Mirrorcart · retailer dashboard</span></div>
         <div className="flex items-center gap-3 text-sm">
           <label className="flex cursor-pointer items-center gap-2 rounded-full border border-white/20 px-3 py-1.5">
-            <input type="checkbox" checked={sample} onChange={(e) => setSample(e.target.checked)} className="accent-[#c6f432]" /> Show SAMPLE data (fake)
+            <input type="checkbox" checked={sample} onChange={(e) => setSample(e.target.checked)} className="accent-[#e8c46c]" /> Show SAMPLE data (fake)
           </label>
           <form action="/api/dashboard/login" method="post"><button name="logout" value="1" className="text-white/60 hover:text-white">Log out</button></form>
         </div>

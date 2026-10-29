@@ -51,7 +51,7 @@ async function render(task: MockTask, id: string): Promise<string> {
   }
   const tag = `${LABEL[task.feature]}${task.body.garment_category ? " · " + task.body.garment_category : ""}`;
   layers.push({
-    input: Buffer.from(`<svg width="768" height="64"><rect width="768" height="64" fill="#101014"/><text x="20" y="41" font-family="monospace" font-size="24" fill="#c6f432">MOCK RESULT · ${tag}</text></svg>`),
+    input: Buffer.from(`<svg width="768" height="64"><rect width="768" height="64" fill="#101014"/><text x="20" y="41" font-family="monospace" font-size="24" fill="#e8c46c">MOCK RESULT · ${tag}</text></svg>`),
     top: 1024 - 64, left: 0,
   });
   const out = await base.composite(layers).jpeg({ quality: 85 }).toBuffer();

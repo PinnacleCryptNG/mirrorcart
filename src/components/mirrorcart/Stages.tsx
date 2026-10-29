@@ -21,7 +21,7 @@ export function ConsentStage({ onAgree }: { onAgree: () => void }) {
         <li>Prefer not to upload? Pick a sample model on the next screen.</li>
       </ul>
       <label className="mt-6 flex cursor-pointer items-start gap-3 rounded-xl border border-white/15 bg-white/5 p-4 text-sm">
-        <input type="checkbox" checked={ok} onChange={(e) => setOk(e.target.checked)} className="mt-0.5 h-4 w-4 accent-[#c6f432]" />
+        <input type="checkbox" checked={ok} onChange={(e) => setOk(e.target.checked)} className="mt-0.5 h-4 w-4 accent-[#e8c46c]" />
         <span>I agree to my photo being processed as described above, only to show me this try-on.</span>
       </label>
       <div className="mt-6 flex gap-3">
@@ -92,7 +92,7 @@ export function PhotoStage(props: {
           {cam ? <video ref={video} playsInline muted className="h-full w-full -scale-x-100 object-cover" /> :
             preview ? <img src={preview.url} alt="Your photo preview" className="h-full w-full object-contain" /> : (
               <svg viewBox="0 0 120 160" className="absolute inset-0 m-auto h-[85%] opacity-60" aria-hidden>
-                <g fill="none" stroke="#c6f432" strokeWidth="1" strokeDasharray="3 3">
+                <g fill="none" stroke="#e8c46c" strokeWidth="1" strokeDasharray="3 3">
                   <circle cx="60" cy="20" r="10" /><path d="M42 36h36l6 50h-8l-2 66h-10l-4-50-4 50H46l-2-66h-8z" />
                 </g>
                 <text x="60" y="158" textAnchor="middle" fontSize="6" fill="#fff" fontFamily="monospace">FULL BODY · FRONT · PLAIN WALL</text>

@@ -39,9 +39,9 @@ async function sharePng(imgUrl: string, items: Item[]) {
   g.fillStyle = "#101014"; g.fillRect(0, 0, W, H);
   const ih = H - 230, iw = ih * (img.width / img.height);
   g.drawImage(img, (W - iw) / 2, 40, iw, ih - 40);
-  g.fillStyle = "#c6f432"; g.fillRect(0, H - 190, W, 4);
+  g.fillStyle = "#e8c46c"; g.fillRect(0, H - 190, W, 4);
   g.fillStyle = "#fff"; g.font = "800 44px sans-serif"; g.fillText("AUREL & THREAD", 48, H - 120);
-  g.font = "24px monospace"; g.fillStyle = "#c6f432"; g.fillText("Tried on with Mirrorcart", 48, H - 80);
+  g.font = "24px monospace"; g.fillStyle = "#e8c46c"; g.fillText("Tried on with Mirrorcart", 48, H - 80);
   g.fillStyle = "rgba(255,255,255,.7)"; g.font = "22px sans-serif";
   g.fillText(items.map((i) => getVariant(i.id, i.variant)?.product.name).filter(Boolean).join(" · ").slice(0, 80), 48, H - 40);
   const blob: Blob = await new Promise((r) => c.toBlob((b) => r(b!), "image/png"));

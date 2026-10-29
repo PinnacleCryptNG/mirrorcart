@@ -4,6 +4,7 @@ import { getVariant, slotOf } from "@/lib/catalog";
 import { api, Item, JobView, ModeInfo, Selfie } from "./api";
 import { btn, ConsentStage, Filmstrip, PhotoStage, StepList } from "./Stages";
 import { ResultViewer } from "./ResultViewer";
+import { MirrorMark } from "@/components/Logo";
 
 type Stage = "consent" | "photo" | "running" | "result";
 
@@ -92,7 +93,7 @@ export function MirrorcartModal(p: MirrorcartProps) {
         <div className="relative max-h-[94vh] overflow-y-auto rounded-[27px] bg-glass/95 p-5 text-white sm:p-8">
           <header className="mb-6 flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <span className="sheen grid h-9 w-9 place-items-center rounded-full bg-gradient-to-br from-white/90 to-white/30 font-display font-extrabold text-ink">M</span>
+              <MirrorMark className="h-10 w-10" tone="light" />
               <div>
                 <p className="font-display text-xl font-bold leading-none">Mirrorcart</p>
                 <p className="font-mono text-[10px] uppercase tracking-widest text-white/50">{items.length} items · {mode?.client === "mock" ? "mock API" : "YouCam API"}</p>
