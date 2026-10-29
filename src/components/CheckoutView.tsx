@@ -38,13 +38,13 @@ export function CheckoutView() {
       <h1 className="font-display text-5xl font-extrabold tracking-[-0.04em]">Checkout</h1>
       <p className="mt-2 text-sm text-muted">Mock checkout: no payment details, nothing ships.</p>
       {triedOn && <p className="mt-4 inline-block rounded-full bg-lime px-3 py-1 font-mono text-[11px] uppercase text-lime-ink">Checking out with confidence: tried on</p>}
-      <ul className="mt-8 divide-y divide-line border-y border-ink">
+      <ul className="mt-8 divide-y divide-line rounded-3xl bg-mist px-5 ring-1 ring-ink/5">
         {rows.map(({ item, product, variant }) => (
           <li key={product.id + variant.id} className="flex justify-between py-3 text-sm"><span>{product.name} · {variant.label} × {item.qty}</span><span className="font-mono">{money(product.price * item.qty)}</span></li>
         ))}
       </ul>
       <div className="mt-4 flex justify-between font-mono"><span>Total</span><span>{money(total)} demo</span></div>
-      <button disabled={!rows.length} onClick={place} className="mt-8 w-full rounded-full bg-ink px-6 py-4 text-paper disabled:opacity-40">Place demo order</button>
+      <button disabled={!rows.length} onClick={place} className="mt-8 w-full rounded-full bg-coral px-6 py-4 font-semibold text-white disabled:opacity-40">Place demo order</button>
     </div>
   );
 }
