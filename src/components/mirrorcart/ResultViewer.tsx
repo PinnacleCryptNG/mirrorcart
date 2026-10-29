@@ -121,7 +121,7 @@ export function ResultViewer(p: {
             return (
               <li key={it.id} className="rounded-xl border border-white/10 p-3">
                 <div className="flex items-center gap-3">
-                  <img src={pv.variant.image} alt="" className="h-14 w-12 rounded-md bg-white object-contain p-1" />
+                  <img src={pv.variant.display ?? pv.variant.image} alt="" className="h-14 w-12 rounded-md bg-white object-contain p-1" />
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium">{pv.product.name} · {pv.variant.label}</p>
                     <p className="font-mono text-[10px] text-white/50">{SLOT_LABEL[slotOf(pv.product, pv.variant)]} · {money(pv.product.price)} demo

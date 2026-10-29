@@ -5,6 +5,8 @@ export type Variant = {
   label: string;
   swatch: string;
   image: string;
+  /** Shop display image when `image` is a worn reference (e.g. skirts and trousers). */
+  display?: string;
   /** Jewellery variants can change the try-on slot (pendant → necklace, hoops → earring). */
   slot?: Slot;
 };
@@ -56,16 +58,16 @@ export const PRODUCTS: Product[] = [
     id: "wide-leg-trousers", name: "Wide-leg Trousers", category: "Bottoms", slot: "lower", price: 84, worn: true,
     blurb: "High-waisted and fluid, pressed with a front crease.", fabric: "Recycled poly-viscose twill", fabricSwappable: true,
     variants: [
-      { id: "black", label: "Black", swatch: "#1a1a1a", image: img("wide-leg-trousers", "black") },
-      { id: "camel", label: "Camel", swatch: "#b08a5b", image: img("wide-leg-trousers", "camel") },
+      { id: "black", label: "Black", swatch: "#1a1a1a", image: img("wide-leg-trousers", "black"), display: img("wide-leg-trousers", "black-flat") },
+      { id: "camel", label: "Camel", swatch: "#b08a5b", image: img("wide-leg-trousers", "camel"), display: img("wide-leg-trousers", "camel-flat") },
     ],
   },
   {
     id: "pleated-midi-skirt", name: "Pleated Midi Skirt", category: "Bottoms", slot: "lower", price: 74, worn: true,
     blurb: "Knife pleats that move when you do.", fabric: "Satin-finish crepe", fabricSwappable: true,
     variants: [
-      { id: "sage", label: "Sage", swatch: "#93ab92", image: img("pleated-midi-skirt", "sage") },
-      { id: "navy", label: "Navy", swatch: "#1f2a4a", image: img("pleated-midi-skirt", "navy") },
+      { id: "sage", label: "Sage", swatch: "#93ab92", image: img("pleated-midi-skirt", "sage"), display: img("pleated-midi-skirt", "sage-flat") },
+      { id: "navy", label: "Navy", swatch: "#1f2a4a", image: img("pleated-midi-skirt", "navy"), display: img("pleated-midi-skirt", "navy-flat") },
     ],
   },
   {

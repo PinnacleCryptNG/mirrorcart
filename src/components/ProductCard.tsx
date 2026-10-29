@@ -9,7 +9,7 @@ export function ProductCard({ product, index }: { product: Product; index: numbe
     <Link href={`/p/${product.id}`} className="group reveal block" style={{ animationDelay: `${index * 40}ms` }}>
       <div className="relative">
         <Mirror ratio={1.25} glass="bg-[#f0f0f0]">
-          <Image src={v.image} alt={`${product.name} in ${v.label}`} fill sizes="(min-width:1024px) 25vw, (min-width:640px) 33vw, 50vw"
+          <Image src={v.display ?? v.image} alt={`${product.name} in ${v.label}`} fill sizes="(min-width:1024px) 25vw, (min-width:640px) 33vw, 50vw"
             className="object-contain p-5 pt-8 transition-transform duration-700 group-hover:scale-[1.05]" />
           <div className="sheen pointer-events-none absolute inset-0 opacity-0 transition group-hover:opacity-100" />
         </Mirror>

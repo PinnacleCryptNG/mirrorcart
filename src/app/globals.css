@@ -122,6 +122,7 @@ body { font-family: var(--font-hanken), system-ui, sans-serif; -webkit-font-smoo
 
 @supports (animation-timeline: view()) {
   .reveal { animation: rise linear both; animation-timeline: view(); animation-range: entry 0% cover 28%; }
+  .piece-in { animation: piece-in linear both; animation-timeline: view(); animation-range: entry 0% entry 90%; }
 }
 
 .no-scrollbar { scrollbar-width: none; } .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -132,8 +133,15 @@ body { font-family: var(--font-hanken), system-ui, sans-serif; -webkit-font-smoo
 .dust { opacity: 0; animation: dust var(--t, 7s) linear var(--d, 0s) infinite; }
 @keyframes dust { 0% { opacity: 0; transform: translateY(0); } 20% { opacity: .9; } 80% { opacity: .5; } 100% { opacity: 0; transform: translateY(-38px); } }
 
+@keyframes piece-in { from { opacity: 0; transform: translateY(-14px) scale(.82); } to { opacity: 1; transform: none; } }
+.flatlay-glass { background: radial-gradient(75% 75% at 45% 42%, #fffaf5 0%, #f9ebe8 70%, #f1d6db 100%); }
+.flash { animation: flash 4.5s ease-in-out infinite; }
+@keyframes flash { 0%, 84%, 100% { opacity: 0; } 88% { opacity: .9; } }
+.viewfinder { animation: viewfinder 4.5s ease-in-out infinite; }
+@keyframes viewfinder { 0%, 78%, 100% { transform: scale(1); } 86% { transform: scale(.88); } }
+
 @media (prefers-reduced-motion: reduce) {
-  .mirror-edge, .sheen::after, .twinkle, .burst, .dust, .glow-pulse, .float-slow, .marquee, .curtain-in, .rise, .reveal, .float, .tag-in, .group:hover .swing-tag { animation: none !important; }
+  .mirror-edge, .sheen::after, .twinkle, .burst, .dust, .flash, .viewfinder, .piece-in, .glow-pulse, .float-slow, .marquee, .curtain-in, .rise, .reveal, .float, .tag-in, .group:hover .swing-tag { animation: none !important; }
   .curtain { display: none; }
 }
 

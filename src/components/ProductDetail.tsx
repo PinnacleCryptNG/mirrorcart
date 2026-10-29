@@ -14,7 +14,7 @@ export function ProductDetail({ product }: { product: Product }) {
     <div className="mx-auto grid max-w-7xl gap-10 px-5 py-10 lg:grid-cols-[1.3fr_1fr]">
       <div key={v.id} className="curtain-in mx-auto w-full max-w-[640px]">
         <Mirror ratio={1.25} rim={3} amp={2.4} waves={12} glass="bg-[#f0f0f0]">
-          <Image src={v.image} alt={`${product.name} in ${v.label}`} fill priority sizes="(min-width:1024px) 55vw, 100vw" className="object-contain p-12" />
+          <Image src={v.display ?? v.image} alt={`${product.name} in ${v.label}`} fill priority sizes="(min-width:1024px) 55vw, 100vw" className="object-contain p-12" />
           <div className="sheen pointer-events-none absolute inset-0" />
         </Mirror>
       </div>

@@ -1,41 +1,54 @@
 import Image from "next/image";
 import Link from "next/link";
-import manifest from "../../../public/demo/manifest.json";
-import { HeroMirror, HeroLook } from "@/components/home/HeroMirror";
-import { BeforeAfter } from "@/components/home/BeforeAfter";
+import { HeroMirror } from "@/components/home/HeroMirror";
+import { FlatLay } from "@/components/home/FlatLay";
+import { LOOKS, LOOKBOOK, lookTotal } from "@/lib/looks";
 import { ShopGrid } from "@/components/home/ShopGrid";
 import { Mirror } from "@/components/Mirror";
 
-const looks = (manifest as { looks: Record<string, string> }).looks;
-const HERO: HeroLook[] = [
-  { name: "Look 01 · Dinner", pieces: [
-    { src: "/hero/cut/wrap-dress-terracotta.png", name: "Wrap dress", detail: "Terracotta · $112", price: 112, slot: "full" },
-    { src: "/hero/cut/block-heel-loafers-tan.png", name: "Loafers", detail: "Tan · $118", price: 118, slot: "shoes" },
-    { src: "/hero/cut/mini-crossbody-burgundy.png", name: "Mini crossbody", detail: "Burgundy · $98", price: 98, slot: "bag" },
-    { src: "/hero/cut/gold-pendant-pendant.png", name: "Gold pendant", detail: "Gold · $58", price: 58, slot: "necklace" },
-  ] },
-  { name: "Look 02 · Gallery", pieces: [
-    { src: "/hero/cut/jumpsuit-black.png", name: "Jumpsuit", detail: "Black · $128", price: 128, slot: "full" },
-    { src: "/hero/cut/block-heel-loafers-black.png", name: "Loafers", detail: "Black · $118", price: 118, slot: "shoes" },
-    { src: "/hero/cut/leather-tote-cognac.png", name: "Leather tote", detail: "Cognac · $165", price: 165, slot: "bag" },
-    { src: "/hero/cut/gold-pendant-hoops.png", name: "Gold hoops", detail: "Gold · $58", price: 58, slot: "necklace" },
-  ] },
-  { name: "Look 03 · Brunch", pieces: [
-    { src: "/hero/cut/wrap-dress-sage.png", name: "Wrap dress", detail: "Sage · $112", price: 112, slot: "full" },
-    { src: "/hero/cut/block-heel-loafers-tan.png", name: "Loafers", detail: "Tan · $118", price: 118, slot: "shoes" },
-    { src: "/hero/cut/mini-crossbody-cream.png", name: "Mini crossbody", detail: "Cream · $98", price: 98, slot: "bag" },
-    { src: "/hero/cut/gold-pendant-hoops.png", name: "Gold hoops", detail: "Gold · $58", price: 58, slot: "necklace" },
-  ] },
-];
 
 const STEPS = [
-  { n: "01", t: "Fill your cart", d: "Pick a dress or a top and skirt, then shoes, a bag and jewellery. Mix colours and fabrics like you would in a store.", img: ["/products/wrap-dress-sage.jpg", "/products/block-heel-loafers-tan.jpg", "/products/mini-crossbody-cream.jpg"] },
-  { n: "02", t: "Add one photo", d: "A full-length, front-facing photo works best. We frame it around you automatically, or you can use one of our sample models.", img: ["/demo/models/amara.jpg"] },
-  { n: "03", t: "See it all on you", d: "Each piece is put on in order, so you see one complete outfit. Swap a colour or fabric, remove what doesn't work, then check out.", img: ["/hero/zola-dinner-2.jpg"] },
+  { n: "01", t: "Fill your cart", d: "Pick a dress or a top and skirt, then shoes, a bag and jewellery. Mix colours and fabrics like you would in a store." },
+  { n: "02", t: "Add one photo", d: "A full-length, front-facing photo works best. We frame it around you automatically, or you can use one of our sample models." },
+  { n: "03", t: "See it all on you", d: "Each piece is put on in order, so you see one complete outfit. Swap a colour or fabric, remove what doesn't work, then check out." },
 ];
+const CART = ["/hero/cut/wrap-dress-sage.png", "/hero/cut/block-heel-loafers-tan.png", "/hero/cut/mini-crossbody-cream.png"];
+
+function StepVisual({ n }: { n: string }) {
+  if (n === "01") return (
+    <>
+      {CART.map((src, i) => (
+        <div key={src} className="w-20" style={{ transform: `rotate(${(i - 1) * 7}deg) translateY(${i === 1 ? -8 : 0}px)` }}>
+          <Mirror ratio={1.42} rim={5.5} amp={3.4} waves={8} glass="flatlay-glass">
+            <Image src={src} alt="" fill sizes="80px" className="object-contain p-3" />
+          </Mirror>
+        </div>
+      ))}
+    </>
+  );
+  if (n === "02") return (
+    <div className="relative w-28">
+      <Mirror ratio={1.42} rim={5.5} amp={3.4} waves={8} glass="flatlay-glass">
+        <div className="viewfinder absolute inset-[18%_16%]">
+          {["left-0 top-0 border-l-2 border-t-2", "right-0 top-0 border-r-2 border-t-2", "bottom-0 left-0 border-b-2 border-l-2", "bottom-0 right-0 border-b-2 border-r-2"].map((c) => (
+            <span key={c} className={`absolute h-4 w-4 border-brass ${c}`} />
+          ))}
+        </div>
+        <p className="serif-i absolute inset-0 grid place-items-center text-[2.6rem] text-velvet">you</p>
+        <div className="flash pointer-events-none absolute inset-0 bg-white" />
+      </Mirror>
+      <span className="absolute -right-3 top-3 rounded-full bg-coral px-2 py-0.5 font-mono text-[10px] text-white">1 photo</span>
+    </div>
+  );
+  return (
+    <div className="relative w-[6.5rem]">
+      <FlatLay look={LOOKS[0]} />
+      <span className="serif-i absolute -right-6 top-6 rounded-full bg-velvet px-2.5 py-0.5 text-sm text-lime">${lookTotal(LOOKS[0])}</span>
+    </div>
+  );
+}
 
 export default function Home() {
-  const after = looks["mei|cloth-v4:ribbed-knit-top:black>cloth-v4:pleated-midi-skirt:sage>shoes-transfer:block-heel-loafers:tan"];
   return (
     <>
       {/* HERO: the fitting room */}
@@ -57,7 +70,7 @@ export default function Home() {
               You&apos;re shopping at <b className="font-semibold text-white">Aurel &amp; Thread</b>, a pretend boutique we built so you can try Mirrorcart for free. Nothing is for sale and nothing ships.
             </p>
           </div>
-          <HeroMirror looks={HERO} />
+          <HeroMirror looks={LOOKS} />
         </div>
       </section>
 
@@ -69,15 +82,7 @@ export default function Home() {
         <div className="mt-12 grid gap-6 md:grid-cols-3">
           {STEPS.map((s) => (
             <article key={s.n} className="reveal flex flex-col rounded-[28px] bg-mist p-6 ring-1 ring-ink/5">
-              <div className="flex h-40 items-end justify-center gap-2">
-                {s.img.map((src, i) => (
-                  <div key={src} className={s.img.length > 1 ? "w-20" : "w-28"} style={{ transform: s.img.length > 1 ? `rotate(${(i - 1) * 7}deg) translateY(${i === 1 ? -8 : 0}px)` : undefined }}>
-                    <Mirror ratio={1.42} rim={5.5} amp={3.4} waves={8} glass="bg-paper">
-                      <Image src={src} alt="" fill sizes="120px" className={s.img.length > 1 ? "object-contain p-2.5" : "object-cover"} />
-                    </Mirror>
-                  </div>
-                ))}
-              </div>
+              <div className="flex h-40 items-end justify-center gap-2"><StepVisual n={s.n} /></div>
               <p className="mt-6 font-mono text-xs text-coral">{s.n}</p>
               <h3 className="mt-1 font-display text-2xl font-bold tracking-tight">{s.t}</h3>
               <p className="mt-2 text-[15px] leading-relaxed text-muted">{s.d}</p>
@@ -86,21 +91,35 @@ export default function Home() {
         </div>
       </section>
 
-      {/* BEFORE / AFTER */}
-      <section className="velvet-deep text-white">
-        <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 py-20 lg:grid-cols-[1fr_1.1fr] lg:py-24">
-          <div className="mx-auto w-full max-w-[380px]"><BeforeAfter before="/demo/models/mei.jpg" after={after} alt="Mei" /></div>
-          <div className="reveal">
+      {/* LOOKBOOK */}
+      <section className="velvet-deep overflow-hidden text-white">
+        <div className="mx-auto max-w-7xl px-5 py-20 lg:py-24">
+          <div className="reveal flex flex-wrap items-end justify-between gap-6">
             <h2 className="font-display text-[clamp(2rem,4.4vw,3.4rem)] font-extrabold leading-[0.98] tracking-[-0.04em]">
-              Same photo.<br /><span className="serif-i font-normal text-lime">Her whole cart.</span>
+              The lookbook.<br /><span className="serif-i font-normal text-lime">Every cart, styled whole.</span>
             </h2>
-            <p className="mt-5 max-w-md text-white/75">Drag the line. On the left is Mei&apos;s photo; on the right she&apos;s wearing a knit top, pleated midi skirt and loafers, put on one after another by the YouCam API.</p>
-            <ul className="mt-8 grid max-w-md gap-3 text-sm sm:grid-cols-2">
-              {["Dresses, jumpsuits, tops & skirts", "Shoes, bags & jewellery", "Swap colour or fabric in place", "Keeps her face, hair & head covering"].map((t) => (
-                <li key={t} className="flex items-center gap-2 rounded-2xl bg-white/5 px-4 py-3 ring-1 ring-white/10"><span className="h-1.5 w-1.5 shrink-0 rounded-full bg-coral" />{t}</li>
-              ))}
-            </ul>
+            <p className="max-w-sm text-white/70">Each look is one cart: every piece, priced together. Add the pieces you love, then press <b className="text-white">See it on me</b> to wear the whole look on your own photo.</p>
           </div>
+          <div className="mt-14 grid gap-12 sm:grid-cols-3 sm:gap-8">
+            {LOOKBOOK.map((l, i) => (
+              <figure key={l.name} className={`group reveal ${i === 1 ? "sm:-translate-y-6" : "sm:translate-y-4"}`}>
+                <div className="relative mx-auto w-full max-w-[290px]">
+                  <div className="glow-pulse pointer-events-none absolute -inset-6 rounded-full bg-[radial-gradient(closest-side,rgba(236,143,176,.28),transparent)] blur-2xl" style={{ animationDelay: `${i * .8}s` }} />
+                  <FlatLay look={l} />
+                </div>
+                <figcaption className="mt-6 text-center">
+                  <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-lime">{l.name}</p>
+                  <p className="mx-auto mt-2 max-w-[260px] text-sm leading-relaxed text-white/70">{l.pieces.map((p) => p.name).join(" · ")}</p>
+                  <p className="serif-i mt-1 text-3xl">${lookTotal(l)}</p>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+          <ul className="reveal mx-auto mt-16 flex max-w-4xl flex-wrap justify-center gap-3 text-sm">
+            {["Dresses, jumpsuits, tops & skirts", "Shoes, bags & jewellery", "Swap colour or fabric in place", "Keeps her face, hair & head covering"].map((t) => (
+              <li key={t} className="flex items-center gap-2 rounded-full bg-white/5 px-4 py-2.5 ring-1 ring-white/10"><span className="h-1.5 w-1.5 shrink-0 rounded-full bg-blush" />{t}</li>
+            ))}
+          </ul>
         </div>
       </section>
 

@@ -3,18 +3,8 @@
 import { useEffect, useId, useMemo, useState } from "react";
 import { mirrorPaths } from "@/lib/mirror";
 import { Mirror } from "@/components/Mirror";
+import { Look, LOOK_SLOT } from "@/lib/looks";
 
-export type HeroSlot = "full" | "shoes" | "bag" | "necklace";
-export type HeroPiece = { src: string; name: string; detail: string; price: number; slot: HeroSlot };
-export type HeroLook = { name: string; pieces: HeroPiece[] };
-
-/* Where each piece lands in the flat-lay (mirror glass is 100 × 150): x, y, w, h, tilt */
-const SLOT: Record<HeroSlot, [number, number, number, number, number]> = {
-  full: [12, 13, 52, 118, -4],
-  necklace: [61, 13, 28, 40, 5],
-  bag: [58, 56, 32, 46, 8],
-  shoes: [50, 110, 42, 26, -7],
-};
 const STAR = "M0 -3C.35 -.35 .35 -.35 3 0C.35 .35 .35 .35 0 3C-.35 .35 -.35 .35 -3 0C-.35 -.35 -.35 -.35 0 -3Z";
 const STARS: [number, number, number, number][] = [[3, 20, 1.1, 0], [97, 46, .8, 1.1], [1, 108, .7, 2.2], [98, 122, 1.2, .6], [72, -3, .7, 1.7]];
 const BURST: [number, number][] = [[0, -15], [13, -8], [14, 7], [0, 15], [-13, 8], [-14, -7]];
@@ -22,7 +12,7 @@ const DUST = Array.from({ length: 16 }, (_, i) => ({ x: 8 + ((i * 37) % 84), y: 
 const TICK = 1500;
 
 /** The opening mirror: a glossy rose squiggle that "reflects" a cart as each piece lands into a styled flat-lay. */
-export function HeroMirror({ looks }: { looks: HeroLook[] }) {
+export function HeroMirror({ looks }: { looks: Look[] }) {
   const [tick, setTick] = useState(0);
   const [still, setStill] = useState(false);
   useEffect(() => {
@@ -87,7 +77,7 @@ export function HeroMirror({ looks }: { looks: HeroLook[] }) {
             ))}
             <g key={li} filter={u("d")} style={{ opacity: leaving ? 0 : 1, transition: "opacity .9s ease" }}>
               {look.pieces.map((p, i) => {
-                const [x, y, w, h, r] = SLOT[p.slot], on = i < landed;
+                const [x, y, w, h, r] = LOOK_SLOT[p.slot], on = i < landed;
                 return (
                   <image key={p.src} href={p.src} x={x} y={y} width={w} height={h} preserveAspectRatio="xMidYMid meet"
                     style={{ transformBox: "fill-box", transformOrigin: "center", opacity: on ? 1 : 0,
@@ -105,7 +95,7 @@ export function HeroMirror({ looks }: { looks: HeroLook[] }) {
           </g>
           <path d={shapes[0].inner} fill="none" stroke="#f3d58f" strokeOpacity=".85" strokeWidth=".8">{morph("inner")}</path>
           {!still && landed > 0 && (() => {
-            const [x, y, w, h] = done ? [0, 0, 100, 150] : SLOT[look.pieces[landed - 1].slot];
+            const [x, y, w, h] = done ? [0, 0, 100, 150] : LOOK_SLOT[look.pieces[landed - 1].slot];
             const s = done ? 2.4 : 1;
             return (
               <g key={`${li}-${landed}`} transform={`translate(${x + w / 2} ${y + h / 2})`}>
