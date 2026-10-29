@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { json } from "@/lib/http";
 import { startJob, view, ChainItem } from "@/lib/orchestrator";
 import { track } from "@/lib/events";
+import { visitorId } from "@/lib/http";
 
 export const runtime = "nodejs";
 
@@ -13,7 +14,7 @@ export async function POST(req: NextRequest) {
     : [];
   const gender = b.gender === "male" ? "male" : b.gender === "female" ? "female" : undefined;
   try {
-    const job = await startJob({ selfieId: String(b.selfieId || ""), items, gender, store: b.store, rerun: !!b.rerun });
+    const job = await startJob({ selfieId: String(b.selfieId || ""), items, gender, store: b.store, rerun: !!b.rerun, visitor: visitorId(req) });
     if (!b.rerun) await track("tryon_started", { store: job.store });
     return json({ jobId: job.id, job: view(job) });
   } catch (e) {

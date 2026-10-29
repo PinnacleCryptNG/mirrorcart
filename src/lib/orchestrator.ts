@@ -42,6 +42,8 @@ export type Selfie = { id: string; hash: string; url: string; createdAt: number;
 
 export type Job = {
   id: string;
+  /** Hashed client IP, for the per-visitor daily unit limit. */
+  visitor?: string;
   /** Swap/fabric re-runs of an earlier try-on; excluded from started/completed funnel counts. */
   rerun?: boolean;
   store: string;
@@ -120,18 +122,48 @@ export async function unitsUsedToday() {
   return Number((await kv.get<number>(`units:${today()}`)) ?? 0);
 }
 
-export async function capReached(extra = 0) {
-  if (config.mock) return false; // mock calls cost nothing; the cap guards real units only
-  return (await unitsUsedToday()) + extra > config.dailyUnitCap;
+/** Sum of YouCam credit balances, cached 10 min; null if unknown (never blocks on a credit API hiccup). */
+export async function creditBalance(): Promise<number | null> {
+  if (config.mock) return null;
+  const cached = await kv.get<{ v: number }>("credit:balance");
+  if (cached) return cached.v;
+  try {
+    const r = (await getClient().getCredit()) as { results?: { amount?: number; amount_dec?: string | number }[] };
+    const v = (r.results ?? []).reduce((a, x) => a + Number(x.amount_dec ?? x.amount ?? 0), 0);
+    await kv.set("credit:balance", { v }, 600);
+    return v;
+  } catch {
+    return null;
+  }
 }
+
+export type LiveLimit = "cap" | "reserve" | "visitor" | null;
+const LIMIT_NOTE: Record<Exclude<LiveLimit, null>, string> = {
+  cap: "Today's live try-on budget is used up; sample models are free",
+  reserve: "Live try-on is paused to keep credits for judging; sample models are free",
+  visitor: "You've used today's live try-ons; sample models are free",
+};
+
+export async function liveLimit(extra = 0, visitor?: string): Promise<LiveLimit> {
+  if (config.mock) return null; // mock calls cost nothing; limits guard real units only
+  if ((await unitsUsedToday()) + extra > config.dailyUnitCap) return "cap";
+  if (visitor && ((await kv.get<number>(`vunits:${visitor}:${today()}`)) ?? 0) + extra > config.visitorDailyUnits) return "visitor";
+  const bal = await creditBalance();
+  if (bal != null && bal - extra < config.creditReserve) return "reserve";
+  return null;
+}
+
+export const capReached = async (extra = 0) => (await liveLimit(extra)) !== null;
 
 export async function modeStatus() {
   const used = await unitsUsedToday();
   const forced = forcedDemo();
   const cap = used >= config.dailyUnitCap;
+  const bal = forced || cap ? null : await creditBalance();
+  const reserve = bal != null && bal <= config.creditReserve;
   return {
-    demoOnly: forced || cap,
-    reason: config.demoMode ? "demo_mode" : forced ? "no_key" : cap ? "cap_reached" : null,
+    demoOnly: forced || cap || reserve,
+    reason: config.demoMode ? "demo_mode" : forced ? "no_key" : cap ? "cap_reached" : reserve ? "reserve" : null,
     client: config.mock ? "mock" : "live",
     unitsUsedToday: used,
     dailyUnitCap: config.dailyUnitCap,
@@ -177,7 +209,7 @@ export async function purgeSelfie(id: string) {
 
 /* ---------- jobs ---------- */
 
-export async function startJob(opts: { selfieId: string; items: ChainItem[]; gender?: "female" | "male"; store?: string; forceDemo?: boolean; rerun?: boolean }) {
+export async function startJob(opts: { selfieId: string; items: ChainItem[]; gender?: "female" | "male"; store?: string; forceDemo?: boolean; rerun?: boolean; visitor?: string }) {
   const selfie = await getSelfie(opts.selfieId);
   if (!selfie) throw new Error("photo_not_found");
   const status = await modeStatus();
@@ -188,7 +220,7 @@ export async function startJob(opts: { selfieId: string; items: ChainItem[]; gen
   let gender = opts.gender;
   if (!gender && selfie.demo) gender = (await getManifest()).models.find((m) => `demo:${m.id}` === selfie.id)?.gender;
   const job: Job = {
-    id: randomUUID(), rerun: !!opts.rerun, store: opts.store || "aurel-demo", selfieId: selfie.id, mode: demo ? "demo" : "live",
+    id: randomUUID(), rerun: !!opts.rerun, visitor: opts.visitor, store: opts.store || "aurel-demo", selfieId: selfie.id, mode: demo ? "demo" : "live",
     client: demo ? "demo" : getClient().kind, gender: gender || "female", steps, skipped, cursor: 0, done: false,
     createdAt: Date.now(), sourceUrl: selfie.url,
   };
@@ -249,7 +281,7 @@ async function buildBody(job: Job, step: Step, inputUrl: string, origin: string)
   const ref = await asInput(step.refUrl!, origin);
   switch (step.feature) {
     case "cloth-v4":
-      return { ...srcField, ...(ref.url ? { ref_file_url: ref.url } : { ref_file_id: ref.id }), garment_category: step.garmentCategory };
+      return { ...srcField, ...(ref.url ? { ref_file_url: ref.url } : { ref_file_id: ref.id }), garment_category: step.garmentCategory, change_shoes: false };
     case "shoes-transfer":
     case "bag":
       return { ...srcField, ...(ref.url ? { ref_file_url: ref.url } : { ref_file_id: ref.id }), gender: job.gender, style: "random" };
@@ -313,12 +345,13 @@ export async function advance(jobId: string, origin: string): Promise<Job> {
         await kv.hincrby("stats", "demo_steps");
       } else {
         const hit = await kv.get<{ url: string }>(`cache:${step.cacheKey}`);
+        let limit: LiveLimit = null;
         if (hit) {
           await Promise.all([kv.hincrby("stats", "cached_hits"), kv.hincrby("stats", "units_saved", UNIT_COST[step.feature])]);
           await completeStep(job, step, hit.url, true);
-        } else if (await capReached(UNIT_COST[step.feature])) {
+        } else if ((limit = await liveLimit(UNIT_COST[step.feature], job.visitor))) {
           job.capHit = true;
-          for (const s of job.steps.slice(i)) { s.status = "skipped"; s.note = "Daily unit cap reached; try demo mode"; }
+          for (const s of job.steps.slice(i)) { s.status = "skipped"; s.note = LIMIT_NOTE[limit]; }
           finish(job);
         } else {
           try {
@@ -346,7 +379,7 @@ export async function advance(jobId: string, origin: string): Promise<Job> {
             await kv.set(`cache:${step.cacheKey}`, { url }, DAY);
             await kv.sadd(`selfie:${selfie.id}:cache`, step.cacheKey!);
             if (getClient().kind === "mock") await kv.hincrby("stats", "mock_steps");
-            else await Promise.all([kv.incrby(`units:${today()}`, UNIT_COST[step.feature], 2 * DAY), kv.hincrby("stats", "units_used", UNIT_COST[step.feature]), kv.hincrby("stats", "live_steps")]);
+            else await Promise.all([kv.incrby(`units:${today()}`, UNIT_COST[step.feature], 2 * DAY), ...(job.visitor ? [kv.incrby(`vunits:${job.visitor}:${today()}`, UNIT_COST[step.feature], 2 * DAY)] : []), kv.hincrby("stats", "units_used", UNIT_COST[step.feature]), kv.hincrby("stats", "live_steps")]);
             await completeStep(job, step, url, false);
           } else if (d.task_status === "error") {
             fallBackToPrevious(job, step, `YouCam: ${d.error || d.error_message || "error"}`);

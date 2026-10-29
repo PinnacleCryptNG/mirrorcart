@@ -23,6 +23,7 @@ const REASON: Record<string, string> = {
   demo_mode: "Demo mode is on: try a sample model for instant, pre-generated looks.",
   no_key: "Live try-on isn't configured on this deployment; sample models still work.",
   cap_reached: "Today's live try-on budget is used up. Sample models are instant and free.",
+  reserve: "Live try-on is paused to save credits for judging. Sample models are instant and free.",
 };
 
 export function MirrorcartModal(p: MirrorcartProps) {

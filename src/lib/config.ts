@@ -8,7 +8,10 @@ export const config = {
   /** Mock is on by default until a key is configured. */
   mock: bool(process.env.YOUCAM_MOCK, !process.env.YOUCAM_API_KEY),
   demoMode: bool(process.env.DEMO_MODE, false),
-  dailyUnitCap: Number(process.env.DAILY_UNIT_CAP || 60),
+  dailyUnitCap: Number(process.env.DAILY_UNIT_CAP || 35),
+  /** Live try-on stops while the YouCam balance is at or below this, so judging never hits zero. */
+  creditReserve: Number(process.env.CREDIT_RESERVE || 150),
+  visitorDailyUnits: Number(process.env.VISITOR_DAILY_UNITS || 16),
   dashboardPass: process.env.DASHBOARD_PASS || "",
   cronSecret: process.env.CRON_SECRET || "",
   siteUrl: process.env.NEXT_PUBLIC_SITE_URL || (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "http://localhost:3000"),
