@@ -23,3 +23,7 @@ Our own summary of the published reference. See https://docs.perfectcorp.com/ref
 - `bag` ✓ 2 units, but it **re-renders the whole scene** (new setting and outfit). Mirrorcart runs bag last as a side branch ("styled scene") and doesn't feed it forward.
 - `2d-vto/necklace` ✓ / `2d-vto/earring` ✓ with `ref_file_urls[]`, `source_info{name}`, `object_infos[{name}]`. Full-body inputs fail with error 4, "Neck size should be larger and position should be in the center", so jewellery runs on an upscaled head-and-shoulders crop that's composited back.
 - `GET /s2s/v2.0/task/template/fabric` ✓ (20 `full_body_*` templates).
+
+## Framing findings (live, 2026-10-29)
+- Wide outdoor shot, subject about 25% of the frame, full_body wrap dress: face altered, hijab removed, sandals added.
+- Same photo cropped 3:4 around the person and upscaled to 768×1024, with `change_shoes:false`: face and hijab preserved, natural dress fit. The jumpsuit (full_body) and pleated skirt (lower_body) were also good.

@@ -51,10 +51,14 @@ Upstash Redis: jobs, cache index, events, daily unit counter      Vercel Blob: s
 
 Swapping a variant or fabric re-runs only from the changed step; earlier steps come from cache.
 
+## Photo framing
+
+YouCam's clothes VTO wants one front-facing person filling at least 80% of the frame. Uploads run through MediaPipe Pose in the browser (wasm and model self-hosted in `public/mediapipe/`). The photo is cropped to 3:4 around the person and warns about a missing face or feet, or more than one person, before any units are spent. `cloth-v4` runs with `change_shoes:false` so the shopper keeps her own shoes unless the cart has shoes. A small subject in a wide photo used to change the face and drop a hijab; framing fixed both in live tests.
+
 ## Modes
 - **Live**: `YOUCAM_API_KEY` set, `YOUCAM_MOCK=false`.
 - **Mock** (`YOUCAM_MOCK=true`, the default when no key is set): a fake client returning the documented shapes (`{status:200,data:{task_id}}`, then `{status:200,data:{task_status:"success",results:{url}}}` after ~2 s) with placeholder composites. Costs nothing.
-- **Demo** (`DEMO_MODE=true`, no key, or `DAILY_UNIT_CAP` reached): 3 sample models × 3 outfits pre-generated in `public/demo/` (`manifest.json` maps chain → image). Regenerate with `npm run demo:generate` against a running server.
+- **Demo** (`DEMO_MODE=true`, no key, `DAILY_UNIT_CAP` reached, or balance at `CREDIT_RESERVE`): 3 sample models × 3 outfits pre-generated in `public/demo/` (`manifest.json` maps chain → image). Regenerate with `npm run demo:generate` against a running server.
 
 ## Setup
 ```bash
@@ -67,7 +71,9 @@ npm run dev                  # http://localhost:3000
 | `YOUCAM_API_KEY` | YouCam key (server only) |
 | `YOUCAM_MOCK` | `true` = fake client (default when no key) |
 | `DEMO_MODE` | force demo mode |
-| `DAILY_UNIT_CAP` | live units/day before falling back to demo (default 60) |
+| `DAILY_UNIT_CAP` | live units/day before falling back to demo (default 35) |
+| `VISITOR_DAILY_UNITS` | live units per visitor (hashed IP) per day (default 16 ≈ 2 full looks) |
+| `CREDIT_RESERVE` | live try-on pauses when the YouCam balance is at or below this (default 150) |
 | `MAX_CHAIN_STEPS` | max items per look (default 5) |
 | `DASHBOARD_PASS` | dashboard password |
 | `CRON_SECRET` | protects the retention cron (Vercel sends it automatically) |
