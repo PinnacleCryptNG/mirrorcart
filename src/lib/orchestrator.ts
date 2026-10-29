@@ -113,6 +113,7 @@ export async function unitsUsedToday() {
 }
 
 export async function capReached(extra = 0) {
+  if (config.mock) return false; // mock calls cost nothing; the cap guards real units only
   return (await unitsUsedToday()) + extra > config.dailyUnitCap;
 }
 
