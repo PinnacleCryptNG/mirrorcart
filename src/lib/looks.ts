@@ -1,5 +1,5 @@
 export type LookSlot = "full" | "upper" | "lower" | "shoes" | "bag" | "necklace";
-export type LookPiece = { src: string; name: string; detail: string; price: number; slot: LookSlot };
+export type LookPiece = { src: string; product: string; variant: string; name: string; detail: string; price: number; slot: LookSlot };
 export type Look = { name: string; pieces: LookPiece[] };
 
 /** Where each piece lands in a mirror flat-lay (glass is 100 × 150): x, y, w, h, tilt. */
@@ -13,7 +13,7 @@ export const LOOK_SLOT: Record<LookSlot, [number, number, number, number, number
 };
 
 const P = (f: string, name: string, detail: string, price: number, slot: LookSlot): LookPiece =>
-  ({ src: `/hero/cut/${f}.png`, name, detail, price, slot });
+  ({ src: `/hero/cut/${f}.png`, product: f.slice(0, f.lastIndexOf("-")), variant: f.slice(f.lastIndexOf("-") + 1), name, detail, price, slot });
 
 export const lookTotal = (l: Look) => l.pieces.reduce((s, p) => s + p.price, 0);
 

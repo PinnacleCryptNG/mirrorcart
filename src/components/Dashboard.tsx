@@ -2,23 +2,18 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Wordmark } from "@/components/StoreChrome";
+import { RETURN_COST, RETURN_RATE, SAMPLE_STATS } from "@/lib/sample-stats";
 
 type Data = { counts: Record<string, number>; swapped: Record<string, number>; dropped: Record<string, number>; stats: Record<string, number>; days: Record<string, Record<string, number>> };
 
-const SAMPLE: Data = {
-  counts: { widget_open: 412, consent_given: 301, tryon_started: 288, tryon_completed: 251, item_swapped: 97, fabric_changed: 41, item_dropped_after_tryon: 63, checkout_after_tryon: 118, photo_deleted: 54 },
-  swapped: { "wrap-dress": 31, "linen-shirt": 22, "wide-leg-trousers": 18, "leather-tote": 12, "white-sneakers": 9 },
-  dropped: { "block-heel-loafers": 19, "pleated-midi-skirt": 14, "denim-jacket": 11 },
-  stats: { units_used: 1460, cached_hits: 388, units_saved: 776, live_steps: 730, demo_steps: 210 },
-  days: {},
-};
+const SAMPLE: Data = SAMPLE_STATS;
 
 const pct = (a: number, b: number) => (b ? `${Math.round((a / b) * 100)}%` : "–");
 
 export function Dashboard(props: { data: Data; names: Record<string, string>; cap: number; client: "mock" | "live" }) {
   const [sample, setSample] = useState(false);
-  const [rate, setRate] = useState(30);
-  const [cost, setCost] = useState(15);
+  const [rate, setRate] = useState(RETURN_RATE);
+  const [cost, setCost] = useState(RETURN_COST);
   const [credit, setCredit] = useState<unknown>(null);
   useEffect(() => {
     const s = JSON.parse(localStorage.getItem("mc-dash-assumptions") || "{}");
