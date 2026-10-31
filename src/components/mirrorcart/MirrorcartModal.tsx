@@ -39,6 +39,9 @@ export function MirrorcartModal(p: MirrorcartProps) {
   const [job, setJob] = useState<JobView | null>(null);
   const [toast, setToast] = useState("");
   const [looks, setLooks] = useState<SavedLook[]>([]);
+  const [pending, setPending] = useState<{ s: Selfie; g?: "female" | "male" } | null>(null);
+  const box = useRef<HTMLDivElement>(null);
+  useEffect(() => { box.current?.scrollTo({ top: 0 }); }, [stage]);
   const alive = useRef(true);
   const runId = useRef(0);
 
@@ -72,11 +75,18 @@ export function MirrorcartModal(p: MirrorcartProps) {
       api.looks(s.id).then((r) => alive.current && my === runId.current && setLooks(r.looks)).catch(() => {});
     } catch (e) {
       const m = (e as Error).message;
+      if (m === "demo_unavailable") {
+        const name = mode?.models.find((x) => `demo:${x.id}` === s.id)?.name ?? "this model";
+        setPending({ s, g: g as "female" | "male" | undefined });
+        setToast(`Sample models wear three ready-made looks. Pick one below for ${name}, or upload your own photo to try your exact cart.`);
+        setStage("photo");
+        return;
+      }
       setToast(m === "demo_only" ? REASON.cap_reached : m === "photo_not_found" ? "Your photo was deleted. Add a new one." : `Try-on failed: ${m}`);
       setStage("photo");
       api.mode().then(setMode).catch(() => {});
     }
-  }, [store]);
+  }, [store, mode]);
 
   async function deletePhoto() {
     if (!selfie || selfie.demo) { setSelfie(null); setJob(null); setStage("photo"); return; }
@@ -94,7 +104,7 @@ export function MirrorcartModal(p: MirrorcartProps) {
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-2 backdrop-blur-sm sm:p-6" onClick={p.embedded ? undefined : p.onClose}>
       <div className="mirror-edge relative w-full max-w-5xl rounded-[28px] p-[1.5px] shadow-2xl" onClick={(e) => e.stopPropagation()}>
-        <div className="relative max-h-[94vh] overflow-y-auto rounded-[27px] bg-glass/95 p-5 text-white sm:p-8">
+        <div ref={box} className="relative max-h-[94vh] overflow-y-auto rounded-[27px] bg-glass/95 p-5 text-white sm:p-8">
           <header className="mb-6 flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <MirrorMark className="h-10 w-10" tone="light" />
@@ -115,8 +125,15 @@ export function MirrorcartModal(p: MirrorcartProps) {
           {stage === "consent" && <ConsentStage onAgree={() => { api.track("consent_given", store); setStage("photo"); }} />}
           {stage === "photo" && (
             <PhotoStage mode={mode} needsGender={needsGender}
-              onLoadOutfit={(o) => { updateItems(o); setToast("Outfit loaded into your cart."); }}
+              pickLookFor={pending ? mode?.models.find((x) => `demo:${x.id}` === pending.s.id)?.name ?? "the model" : undefined}
+              onLoadOutfit={(o) => {
+                updateItems(o);
+                if (!pending) { setToast("Outfit loaded into your cart. It replaced what was there."); return; }
+                setPending(null); setToast(""); setSelfie(pending.s); setGender(pending.g); setLooks([]);
+                run(pending.s, o, pending.g);
+              }}
               onSelfie={(s, g) => {
+                setPending(null); setToast("");
                 setSelfie(s); setGender(g); setLooks([]);
                 if (s.matched) setToast("Welcome back: we recognised this photo, so any look you've already tried loads instantly at 0 credits.");
                 run(s, items, g);
@@ -126,8 +143,8 @@ export function MirrorcartModal(p: MirrorcartProps) {
             <div className="rise grid gap-6 lg:grid-cols-[1.1fr_1fr]">
               <Mirror ratio={4 / 3} rim={3} glass="bg-black/40" className="mx-auto w-full max-w-[460px]">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img key={job.finalUrl || job.steps.findLast((s) => s.outputUrl)?.outputUrl || job.sourceUrl}
-                  src={job.steps.findLast((s) => s.outputUrl)?.outputUrl || job.sourceUrl} alt="Current try-on" className="curtain-in h-full w-full object-contain" />
+                <img key={job.steps.findLast((s) => s.outputUrl && !s.branch)?.outputUrl || job.sourceUrl}
+                  src={job.steps.findLast((s) => s.outputUrl && !s.branch)?.outputUrl || job.sourceUrl} alt="Current try-on" className="curtain-in h-full w-full object-contain" />
                 <div className="sheen absolute inset-0" />
                 <p className="absolute left-1/2 top-[7%] -translate-x-1/2 whitespace-nowrap rounded-full bg-black/60 px-3 py-1 font-mono text-[10px] uppercase tracking-widest">
                   Chaining step {Math.min(job.cursor + 1, job.steps.length)} / {job.steps.length}

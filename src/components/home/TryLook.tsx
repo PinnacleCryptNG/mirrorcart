@@ -10,10 +10,7 @@ export function TryLook({ look, children, className }: { look: Look; children: R
     <button
       className={className}
       onClick={() => {
-        for (const p of look.pieces) {
-          const { product: productId, variant: variantId } = p;
-          if (!cart.get().some((i) => i.productId === productId && i.variantId === variantId)) cart.add(productId, variantId);
-        }
+        cart.replace(look.pieces.map((p) => ({ productId: p.product, variantId: p.variant, qty: 1 })));
         router.push("/cart?try=1");
       }}
     >

@@ -313,6 +313,12 @@ export async function startJob(opts: { selfieId: string; items: ChainItem[]; gen
   const demo = !!selfie.demo || !!opts.forceDemo;
   const { steps, skipped } = planChain(opts.items);
   if (!steps.length) throw new Error("nothing_to_try_on");
+  if (selfie.demo && !opts.rerun) {
+    const { looks } = await getManifest();
+    const model = selfie.id.replace(/^demo:/, "");
+    if (steps.some((_, i) => !looks[demoKey(model, steps.slice(0, i + 1).map((s) => s.sig))]))
+      throw Object.assign(new Error("demo_unavailable"), { reason: "not_pregenerated" });
+  }
   if (!demo && status.demoOnly && !(await fullyCached(selfie.hash, steps))) throw Object.assign(new Error("demo_only"), { reason: status.reason });
   let gender = opts.gender;
   if (!gender && selfie.demo) gender = (await getManifest()).models.find((m) => `demo:${m.id}` === selfie.id)?.gender;

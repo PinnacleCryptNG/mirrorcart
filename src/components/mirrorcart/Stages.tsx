@@ -34,7 +34,7 @@ export function ConsentStage({ onAgree }: { onAgree: () => void }) {
 }
 
 export function PhotoStage(props: {
-  mode: ModeInfo | null; onSelfie: (s: Selfie, gender: "female" | "male" | undefined) => void; onLoadOutfit: (items: Item[]) => void; needsGender: boolean;
+  mode: ModeInfo | null; onSelfie: (s: Selfie, gender: "female" | "male" | undefined) => void; onLoadOutfit: (items: Item[]) => void; needsGender: boolean; pickLookFor?: string;
 }) {
   const { mode } = props;
   const [gender, setGender] = useState<"female" | "male" | "">("female");
@@ -45,6 +45,8 @@ export function PhotoStage(props: {
   const video = useRef<HTMLVideoElement>(null);
   const stream = useRef<MediaStream | null>(null);
   const liveOk = mode ? !mode.demoOnly : false;
+  const looksBox = useRef<HTMLDivElement>(null);
+  useEffect(() => { if (props.pickLookFor) looksBox.current?.scrollIntoView({ behavior: "smooth", block: "center" }); }, [props.pickLookFor]);
 
   useEffect(() => () => stream.current?.getTracks().forEach((t) => t.stop()), []);
 
@@ -146,10 +148,10 @@ export function PhotoStage(props: {
           ))}
         </div>
         {!!mode?.outfits.length && (
-          <div className="mt-5">
-            <p className="text-sm text-white/60">Demo looks are pre-generated for these outfits:</p>
+          <div ref={looksBox} className={`mt-5 rounded-2xl transition ${props.pickLookFor ? "border border-lime/60 bg-lime/10 p-4" : ""}`}>
+            <p className={`text-sm ${props.pickLookFor ? "font-medium text-lime" : "text-white/60"}`}>{props.pickLookFor ? `Pick a look for ${props.pickLookFor}:` : "Sample models wear these ready-made looks. Loading one replaces your cart:"}</p>
             <div className="mt-2 flex flex-wrap gap-2">
-              {mode.outfits.map((o) => <button key={o.id} onClick={() => props.onLoadOutfit(o.items)} className="rounded-full border border-white/20 px-3 py-1 text-xs hover:border-lime">Load “{o.title}”</button>)}
+              {mode.outfits.map((o) => <button key={o.id} onClick={() => props.onLoadOutfit(o.items)} className={`rounded-full border px-3 py-1 text-xs hover:border-lime ${props.pickLookFor ? "border-lime/70 bg-black/20 text-white" : "border-white/20"}`}>{props.pickLookFor ? `Try “${o.title}”` : `Load “${o.title}”`}</button>)}
             </div>
           </div>
         )}
@@ -189,12 +191,12 @@ export function Filmstrip({ job, active, onPick }: { job: JobView; active?: numb
         <img src={job.sourceUrl} alt="Original photo" className="h-full w-full object-cover" />
         <span className="absolute bottom-0 inset-x-0 bg-black/70 text-[9px] font-mono">ORIGINAL</span>
       </button>
-      {job.steps.map((s, i) => (
+      {job.steps.map((s, i) => s.branch ? null : (
         <button key={s.sig + i} disabled={!s.outputUrl} onClick={() => onPick?.(i)}
           className={`relative h-28 w-20 shrink-0 overflow-hidden rounded-lg border ${active === i ? "border-lime" : "border-white/15"} ${s.outputUrl ? "curtain-in" : ""}`}>
           {s.outputUrl ? <img src={s.outputUrl} alt={s.label} className="h-full w-full object-cover" /> :
             <span className={`grid h-full place-items-center text-[10px] text-white/40 ${s.status === "running" ? "sheen bg-white/5" : ""}`}>{s.status === "running" ? "rendering" : s.status}</span>}
-          <span className="absolute bottom-0 inset-x-0 bg-black/70 text-[9px] font-mono">{i + 1}. {stepLabel(s).toUpperCase()}{s.branch ? " · SCENE" : ""}</span>
+          <span className="absolute bottom-0 inset-x-0 bg-black/70 text-[9px] font-mono">{i + 1}. {stepLabel(s).toUpperCase()}</span>
         </button>
       ))}
     </div>

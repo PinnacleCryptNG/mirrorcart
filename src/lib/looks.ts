@@ -17,11 +17,12 @@ const P = (f: string, name: string, detail: string, price: number, slot: LookSlo
 
 export const lookTotal = (l: Look) => l.pieces.reduce((s, p) => s + p.price, 0);
 
+/** LOOKS[0] must match the demo manifest's "dinner" outfit so sample models can wear it. */
 export const LOOKS: Look[] = [
   { name: "Look 01 · Dinner", pieces: [
     P("wrap-dress-terracotta", "Wrap dress", "Terracotta · $112", 112, "full"),
-    P("block-heel-loafers-tan", "Loafers", "Tan · $118", 118, "shoes"),
-    P("mini-crossbody-burgundy", "Mini crossbody", "Burgundy · $98", 98, "bag"),
+    P("block-heel-loafers-black", "Loafers", "Black · $118", 118, "shoes"),
+    P("mini-crossbody-cream", "Mini crossbody", "Cream · $98", 98, "bag"),
     P("gold-pendant-pendant", "Gold pendant", "Gold · $58", 58, "necklace"),
   ] },
   { name: "Look 02 · Gallery", pieces: [

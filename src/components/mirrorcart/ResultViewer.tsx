@@ -104,8 +104,10 @@ export function ResultViewer(p: {
         <BeforeAfter before={job.sourceUrl} after={shown} />
         <Filmstrip job={job} active={pick ?? lastMain} onPick={setPick} />
         {job.sceneUrl && (
-          <button onClick={() => setPick(job.steps.findIndex((s) => s.branch))} className="w-full rounded-xl border border-white/15 px-3 py-2 text-left text-xs text-white/70 hover:border-lime">
-            <b className="text-white">Bag styled scene →</b> YouCam Bag VTO re-renders the whole setting, so the bag is shown as its own styled shot instead of feeding the outfit chain.
+          <button onClick={() => setPick(job.steps.findIndex((s) => s.branch))}
+            className={`flex w-full items-center gap-3 rounded-xl border px-3 py-2 text-left text-xs text-white/70 hover:border-lime ${pick != null && job.steps[pick]?.branch ? "border-lime" : "border-white/15"}`}>
+            <img src={job.sceneUrl} alt="Bag styled scene" className="h-16 w-12 shrink-0 rounded-md object-cover" />
+            <span><b className="text-white">Bag styled scene →</b> YouCam&apos;s bag try-on re-renders the whole setting, so the bag gets its own styled shot and stays out of the outfit filmstrip.</span>
           </button>
         )}
       </div>
