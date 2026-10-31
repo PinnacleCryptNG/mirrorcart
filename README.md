@@ -6,10 +6,16 @@ Most try-on tools show one item on a stock model. Mirrorcart is a **checkout-sta
 
 The demo store, **Aurel & Thread**, is fictional: 12 products, AI-generated product flat-lays, no real logos.
 
+| Storefront | The whole cart, tried on |
+|---|---|
+| ![Storefront](docs/screenshots/home.png) | ![Try-on result](docs/screenshots/tryon.png) |
+| ![Lookbook](docs/screenshots/lookbook.png) | ![Retailer dashboard](docs/screenshots/dashboard.png) |
+| ![For shops](docs/screenshots/for-shops.png) | ![Embedded on another shop](docs/screenshots/embed-demo.png) |
+
 ## Try it (judges)
-1. Open https://mirrorcart.vercel.app → add a few items (or skip ahead) → **Cart → See it on me**.
+1. Open https://mirrorcart.vercel.app → add a few items → **Cart → See it on me**, or press **See it on me** at the bottom of the homepage to load a whole look.
 2. Tick consent → pick a **sample model** (instant pre-generated looks, free) or upload your own full-body photo (live YouCam, under the daily cap).
-3. Watch the chain run step by step → drag the before/after slider → **Swap variant / Change fabric / Remove** → **Checkout with confidence**.
+3. Watch the chain run step by step → drag the before/after slider → **Swap variant / Change fabric / Remove** → reopen earlier looks from **Your fitting room** (0 units) → **Checkout with confidence**.
 4. Dashboard: https://mirrorcart.vercel.app/dashboard (password in the Devpost testing instructions).
 5. Embed proof: https://mirrorcart.vercel.app/embed-demo.html (a plain HTML "other shop" using the one-line script).
 
@@ -55,7 +61,7 @@ Swapping a variant or fabric re-runs only from the changed step; earlier steps c
 
 ## Photo framing
 
-YouCam's clothes VTO wants one front-facing person filling at least 80% of the frame. Uploads run through MediaPipe Pose in the browser (wasm and model self-hosted in `public/mediapipe/`). The photo is cropped to 3:4 around the person and warns about a missing face or feet, or more than one person, before any units are spent. `cloth-v4` runs with `change_shoes:false` so the shopper keeps her own shoes unless the cart has shoes. A small subject in a wide photo used to change the face and drop a hijab; framing fixed both in live tests.
+YouCam's clothes VTO wants one front-facing person filling at least 80% of the frame. Uploads run through MediaPipe Pose in the browser (wasm and model self-hosted in `public/mediapipe/`). The photo is cropped to 3:4 around the person and warns about a missing face or feet, or more than one person, before any units are spent. `cloth-v4` runs with `change_shoes:false` so the shopper keeps their own shoes unless the cart has shoes. A small subject in a wide photo used to change the face and drop a hijab; framing fixed both in live tests.
 
 ## Modes
 - **Live**: `YOUCAM_API_KEY` set, `YOUCAM_MOCK=false`.
@@ -103,7 +109,7 @@ Checks: `npm run lint && npm run typecheck && npm run build`.
 - YouCam's docs state uploaded and generated files may be kept for up to 30 days on their side (result URLs expire in about 2 h). That's why we copy results into our own Blob and call task deletion. See [/privacy](https://mirrorcart.vercel.app/privacy).
 
 ## Credits
-All product, model and fabric-swatch images are original, AI-generated for this project (no real brands, logos or people); see [`public/products/CREDITS.md`](public/products/CREDITS.md). Try-on outputs are produced by the YouCam API (Perfect Corp). Fonts: Syne, Inter Tight, Martian Mono (SIL OFL, via Google Fonts).
+All product, model and fabric-swatch images are original, AI-generated for this project (no real brands, logos or people); see [`public/products/CREDITS.md`](public/products/CREDITS.md). Try-on outputs are produced by the YouCam API (Perfect Corp). Fonts: Archivo, Hanken Grotesk, Instrument Serif, DM Mono (SIL OFL, via Google Fonts).
 
 ## Licence
 MIT © 2026 AbdulMalik Yusuf (Pinnacle Crypt)

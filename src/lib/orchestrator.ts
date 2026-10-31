@@ -423,11 +423,13 @@ function fallBackToPrevious(job: Job, step: Step, note: string, status: StepStat
 
 /** Advance the job by at most one YouCam call. Called repeatedly by the client. */
 export async function advance(jobId: string, origin: string): Promise<Job> {
-  const job = await getJob(jobId);
-  if (!job) throw new Error("job_not_found");
-  if (job.done) return job;
-  if (!(await kv.setnx(`lock:job:${jobId}`, 20))) return job;
+  const seen = await getJob(jobId);
+  if (!seen) throw new Error("job_not_found");
+  if (seen.done) return seen;
+  if (!(await kv.setnx(`lock:job:${jobId}`, 20))) return seen;
   try {
+    const job = (await getJob(jobId)) ?? seen;
+    if (job.done) return job;
     const selfie = await getSelfie(job.selfieId);
     if (!selfie) throw new Error("photo_deleted");
     const i = job.cursor;
